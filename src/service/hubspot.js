@@ -143,6 +143,8 @@ async function getHubspotCompanies(limit = 100) {
 //   }
 // }
 
+// create in company in momentum
+
 async function createCompanyInMomentum(companyData, accessToken) {
   try {
     const response = await axios.post(
@@ -192,7 +194,7 @@ async function createHubspotCompany(company, token) {
       }
     };
 
-    console.log("Payload to HubSpot:", payload);
+    // console.log("Payload to HubSpot:", payload);
 
     const response = await axios.post(url, payload, {
       headers: {
@@ -201,7 +203,7 @@ async function createHubspotCompany(company, token) {
       }
     });
 
-    console.log("Company created in HubSpot:", response.data);
+    // console.log("Company created in HubSpot:", response.data);
     return response.data;
 
   } catch (error) {
@@ -320,8 +322,8 @@ async function createHubspotContact(contactData) {
       }
     };
 
-    console.log("Creating HubSpot Contact:", payload);
-    console.log("TOKEN CHECK:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
+    // console.log("Creating HubSpot Contact:", payload);
+    // console.log("TOKEN CHECK:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
 
     const response = await axios.post(
       "https://api.hubapi.com/crm/v3/objects/contacts",
@@ -429,10 +431,10 @@ async function searchContactBySourceId(sourceId) {
       });
 
       allCompanies = allCompanies.concat(response.data.results);
-
+      
       return allCompanies;
       
-
+      
       // pagination check
       if (!response.data.paging || !response.data.paging.next) break;
 

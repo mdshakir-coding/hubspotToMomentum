@@ -9,7 +9,7 @@
     // console.log("HubSpot contacts fetched successfully:", hubspotContacts.length);
     // console.log("........fetching")
     const token = await getAccessToken();
-    console.log ("token fetched successfully:", token);
+    // console.log ("token fetched successfully:", token);
 
     //create company in hubspot
 
@@ -35,7 +35,7 @@
 
         // get contact from momentum
     const contacts = await getMomentumInsuredContacts(token, comp.databaseId);
-    console.log("Contacts fetched from Momentum:", contacts);
+    console.log("Contacts fetched from Momentum:", contacts[0].databaseId);
 
     
     console.log("➕ Created new HubSpot Company:", newCompany.properties.name);
@@ -50,7 +50,7 @@
 
     // create contact in hubspot 
     const newContact = await createHubspotContact(contacts);
-    console.log("Contact created successfully in HubSpot:", newContact);
+    console.log("Contact created successfully in HubSpot:", newContact.id);
     
     // associate contact to company
     const associateResponse = await associateCompanyToContact(newCompany.id, newContact.id);
@@ -91,7 +91,7 @@
     // const accessToken = await getAccessToken();
       
     // Sync all HubSpot companies
-    
+
     console.log("Fetching all HubSpot companies...");
 
     const allCompanies = await getAllHubspotCompanies();
@@ -100,6 +100,7 @@
 
     for (const comp of allCompanies) {
       console.log("Company:", comp.properties.name);
+      break;
     }
 
   } catch (error) {
@@ -108,25 +109,6 @@
   }
 }
 
- // Sync all HubSpot companies
-
-//  {
-//   try {
-//     console.log("Fetching all HubSpot companies...");
-
-//     const allCompanies = await getAllHubspotCompanies();
-
-//     console.log("Total companies found:", allCompanies.length);
-
-    
-//     for (const comp of allCompanies) {
-//       console.log("Company:", comp.properties.name);
-//     }
-
-//   } catch (err) {
-//     console.error("❌ Error in syncing:", err.message);
-//   }
-// }
 
 
 

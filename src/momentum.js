@@ -1,6 +1,6 @@
 import "dotenv/config";
 // import dotenv from "dotenv";
-import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,hubspotToMomentumsync,} from "./index.js";
+import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,hubspotToMomentumsync} from "./index.js";
   
 
 console.log("Loaded Token:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
@@ -13,6 +13,7 @@ app.listen(PORT, function () {
   // hubspotToMomentumsync();
     //  createCompanyInMomentum();
     hubspotToMomentumsync();
+  
     
     
   logger.info(`Listening on port ${PORT}`);

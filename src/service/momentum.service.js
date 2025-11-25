@@ -121,7 +121,7 @@ async function insertInsuredInMomentum(contact, token) {
       // withCredentials: true 
     });
 
-    console.log("NowCerts Customers Fetched:", response.data);
+    // console.log("NowCerts Customers Fetched:", response.data);
     return response.data;
   } catch (error) {
     console.error(
