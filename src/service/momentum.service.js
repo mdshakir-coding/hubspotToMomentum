@@ -50,17 +50,8 @@ async function insertInsuredInMomentum(contact, token) {
       Zip: contactData.zip
     }
 
-    // dummy payload
-//  const payload = {
-//       FirstName:contactData.firstname || "John",
-//       LastName : contactData.lastname|| "Doe",
-//       Email: contactData.email|| "john.doe@example.com",
-//       Phone: contactData.phone|| "555-123-4567",
-//       Address1: contactData.address|| "test",
-//       City: contactData.city|| "delhi",
-//       State: contactData.state|| "Delhi",
-//       Zip: contactData.zip || "110018"
-//     }
+    console.log('contact:',contact);
+    
     console.log('payload',payload); 
     const response = await axios.post(
       "https://api.nowcerts.com/api/Insured/Insert",
@@ -128,7 +119,7 @@ async function insertInsuredInMomentum(contact, token) {
       "Error fetching customers from NowCerts:",
       error.response?.data || error.message
     );
-    return null
+    return [];
   }
 }
 
@@ -156,6 +147,10 @@ async function insertInsuredInMomentum(contact, token) {
   }
 }
 
+
+
+
+
   // put company in momentum
 
 async function PutCompanyInMomentum(token, companyData) {
@@ -177,9 +172,10 @@ async function PutCompanyInMomentum(token, companyData) {
     throw new Error(`Error creating company: ${response.status} ${JSON.stringify(errorData)}`);
   }
 
-  return response.json();
+  return response.json();s
 }
 
 
 export { getAccessToken, insertInsuredInMomentum, createOpportunityInMomentum, fetchMomentumCustomers
   ,getMomentumInsuredContacts,PutCompanyInMomentum};
+  

@@ -36,7 +36,7 @@ async function getHubspotContacts(limit = 100) {
 
       logger.info(`Fetched ${data.results.length} contacts`);
 
-      return contacts;
+       return contacts; 
 
       if (data.paging?.next?.after) {
         after = data.paging.next.after;
@@ -56,10 +56,50 @@ async function getHubspotContacts(limit = 100) {
     return [];
   }
 }
+//-----------------------------------------------------+----------------------------------------------------------
+// Add Delta function
+
+// async function getHubspotContacts() {
+//   try {
+//     // Calculate timestamp 2 hours ago
+//     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+
+//     const payload = {
+//       filterGroups: [
+//         {
+//           filters: [
+//             {
+//               propertyName: "lastmodifieddate",
+//               operator: "GT",
+//               value: twoHoursAgo
+//             }
+//           ]
+//         }
+//       ],
+//       properties: ["firstname", "lastname", "email", "address", "phone", "city", "state", "zip"],
+//       limit: 100
+//     };
+
+//     const response = await hubspot.post("contacts/search", payload);
+
+//     const contacts = response.data.results;
+
+//     logger.info(`Fetched ${contacts.length} contacts updated in last 2 hours`);
+
+//     return contacts;
+//   } catch (error) {
+//     logger.error("Error fetching delta contacts:", error.response?.data || error.message);
+//     return [];
+//   }
+// }
+
+//-----------------------------------------------------+----------------------------------------------------------
+
 
 // ---------------------
   //  GET COMPANIES
 // ---------------------
+
 async function getHubspotCompanies(limit = 100) {
   let companies = [];
   let after = undefined;
@@ -104,6 +144,7 @@ async function getHubspotCompanies(limit = 100) {
   }
 
 }
+
 
  // services/momentumContact.service.js
 
@@ -178,7 +219,7 @@ async function createCompanyInMomentum(companyData, accessToken) {
 // create company in hubspot  
 
 
-async function createHubspotCompany(company, token) {
+async function createHubspotCompany(company) {
   try {
     const url = "https://api.hubapi.com/crm/v3/objects/companies";
 
@@ -204,7 +245,7 @@ async function createHubspotCompany(company, token) {
     });
 
     // console.log("Company created in HubSpot:", response.data);
-    return response.data;
+    return response.results[0];
 
   } catch (error) {
     console.error(
@@ -217,7 +258,49 @@ async function createHubspotCompany(company, token) {
 
 
 
- async function searchCompanyBySourceId(sourceId) {
+//  async function searchCompanyBySourceId(sourceId) {
+//   try {
+//     const url = "https://api.hubapi.com/crm/v3/objects/companies/search";
+
+//     const payload = {
+//       filterGroups: [
+//         {
+//           filters: [
+//             {
+//               propertyName: "sourceid",
+//               operator: "EQ",
+//               value: sourceId
+//             }
+//           ]
+//         }
+//       ],
+//       properties: ["name", "sourceid", "domain", "createdate"],
+//       limit: 1
+//     };
+
+//     const response = await axios.post(url, payload, {
+//       headers: {
+//         Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//         "Content-Type": "application/json"
+//       }
+//     });
+
+//     console.log("HubSpot company search result:", response.data);
+//     return response.data.results[0];
+
+//   } catch (error) {
+//     console.error(
+//       "Error searching company by sourceId:",
+//       error.response?.data || error.message
+//     );
+//     throw error;
+//   }
+// }
+
+// getAssociatedCompanies
+
+
+async function searchCompanyBySourceId(sourceId, name) {
   try {
     const url = "https://api.hubapi.com/crm/v3/objects/companies/search";
 
@@ -229,6 +312,11 @@ async function createHubspotCompany(company, token) {
               propertyName: "sourceid",
               operator: "EQ",
               value: sourceId
+            },
+            {
+              propertyName: "name",
+              operator: "EQ",
+              value: name
             }
           ]
         }
@@ -245,18 +333,16 @@ async function createHubspotCompany(company, token) {
     });
 
     console.log("HubSpot company search result:", response.data);
-    return response.data;
+    return response.data.results[0] || null;
 
   } catch (error) {
     console.error(
-      "Error searching company by sourceId:",
+      "Error searching company by sourceId and name:",
       error.response?.data || error.message
     );
-    throw error;
+    return null;
   }
 }
-
-// getAssociatedCompanies
 
  async function getAssociatedCompanies(contactIds) {
   const url = "https://api.hubapi.com/crm/v4/associations/contacts/companies/batch/read";
@@ -307,23 +393,28 @@ async function createHubspotCompany(company, token) {
  
 
    // create contact to hubspot
-async function createHubspotContact(contactData) {
+async function createHubspotContact(contactData,contactid) {
   try {
     const payload = {
       properties: {
-        firstname: contactData.firstname,
-        lastname: contactData.lastname,
-        email: contactData.email,
-        phone: contactData.phone,
-        address: contactData.address,
-        city: contactData.city,
-        state: contactData.state,
-        zip: contactData.zip,
+        firstname: contactData.firstName,
+        lastname: contactData.lastName,
+        email: contactData.businessEMail,
+        phone: contactData.homePhone,
+        // address: contactData.address,
+        // city: contactData.city,
+        // state: contactData.state,
+        // zip: contactData.zip,
+        sourceid: contactData.databaseId
       }
     };
 
-    // console.log("Creating HubSpot Contact:", payload);
+    console.log("Payload to HubSpot:", contactData);
+
+    console.log("Creating HubSpot Contact payload:", payload);
     // console.log("TOKEN CHECK:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
+
+    // return;
 
     const response = await axios.post(
       "https://api.hubapi.com/crm/v3/objects/contacts",
@@ -336,7 +427,7 @@ async function createHubspotContact(contactData) {
       }
     );
 
-    return response.data;
+    return response.data.results[0];
 
   } catch (error) {
     console.error("❌ HubSpot Create Contact Error:", error.response?.data || error);
@@ -449,6 +540,157 @@ async function searchContactBySourceId(sourceId) {
   }
 }
 
+   // search contact by email
+// async function searchContactByEmail(email) {
+//   try {
+//     const payload = {
+//       filterGroups: [
+//         {
+//           filters: [
+//             {
+//               propertyName: "email",
+//               operator: "EQ",
+//               value: email,
+//             }
+//           ]
+//         }
+//       ],
+//       properties: [
+//         "firstname",
+//         "lastname",
+//         "email",
+//         "phone",
+//         "city",
+//         "state",
+//         "address",
+//         "zip"
+//       ],
+//       limit: 1
+//     };
+
+//     const response = await hubspot.post(
+//       "crm/v3/objects/contacts/search",
+//       payload
+//     );
+
+//     const results = response.data.results;
+
+//     if (results.length === 0) {
+//       logger.info(`No contact found for email: ${email}`);
+//       return {};
+//     }
+
+//     logger.info(`Contact found for email ${email}: ${results[0].id}`);
+//     return results[0];  // return contact object
+
+//   } catch (error) {
+//     logger.error(
+//       "Error searching contact by email:",
+//       error.response?.data || error.message
+//     );
+//     return {};
+//   }
+// }
+
+async function searchContactByEmail(email) {
+  try {
+    const payload = {
+      filterGroups: [
+        {
+          filters: [
+            {
+              propertyName: "email",
+              operator: "EQ",
+              value: email,
+            }
+          ]
+        }
+      ],
+      properties: [
+        "firstname",
+        "lastname",
+        "email",
+        "phone",
+        "city",
+        "state",
+        "address",
+        "zip"
+      ],
+      limit: 1
+    };
+
+    // FIXED ENDPOINT
+    const response = await hubspot.post(
+      "contacts/search",
+      payload
+    );
+
+    const results = response.data.results;
+
+    if (results.length === 0) {
+      logger.info(`No contact found for email: ${email}`);
+      return null;
+    }
+
+    logger.info(`Contact found for email ${email}: ${results[0].id}`);
+    return results[0];
+
+  } catch (error) {
+    logger.error(
+      "Error searching contact by email:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+}
+
+// update contact in hubspot based in contactid
+async function updateHubspotContact(contactData, contactId) {
+  try {
+    const payload = {
+      properties: {
+        firstname: contactData.firstName,
+        lastname: contactData.lastName,
+        email: contactData.businessEMail,
+        phone: contactData.homePhone,
+        // address: contactData.address,
+        // city: contactData.city,
+        // state: contactData.state,
+        // zip: contactData.zip,
+        sourceid: contactData.databaseId
+      }
+    };
+
+    console.log("Updating HubSpot Contact payload:", payload);
+    console.log("Updating contact ID:", contactId);
+
+    const response = await axios.patch(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log("✔ HubSpot contact updated successfully");
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "❌ HubSpot Update Contact Error:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+}
+
+
+
+
+
 
 export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createHubspotCompany,associateCompanyToContact
-, getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,getAllHubspotCompanies};
+, getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,getAllHubspotCompanies,searchContactByEmail,updateHubspotContact};

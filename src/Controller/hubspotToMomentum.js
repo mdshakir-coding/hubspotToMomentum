@@ -1,115 +1,126 @@
 // controllers/momentum.controller.js
-  import{insertInsuredInMomentum} from "../service/momentum.service.js"
-  import { app,logger,searchCompanyBySourceId,createHubspotCompany,getHubspotContacts,getHubspotCompanies, createCompanyInMomentum , 
-  getAccessToken,fetchMomentumCustomers,getMomentumInsuredContacts,createHubspotContact, searchContactBySourceId,associateCompanyToContact,getAllHubspotCompanies} from "../index.js"
-  async function hubspotToMomentumsync() {
+
+import {
+  getHubspotContacts,
+  getHubspotCompanies,
+  getAccessToken,
+  fetchMomentumCustomers,
+  getMomentumInsuredContacts,
+  createHubspotCompany,
+  createHubspotContact,
+  searchCompanyBySourceId,
+  searchContactBySourceId,
+  associateCompanyToContact,
+  insertInsuredInMomentum,
+  searchContactByEmail,
+  updateHubspotContact,
+  logger,
+} from "../index.js";
+
+async function hubspotToMomentumsync() {
   try {
-    // Fetch contacts from HubSpot
-    const hubspotContacts = await getHubspotContacts();
-    // console.log("HubSpot contacts fetched successfully:", hubspotContacts.length);
-    // console.log("........fetching")
     const token = await getAccessToken();
-    // console.log ("token fetched successfully:", token);
 
-    //create company in hubspot
+    // -------------------------
+    // 1️⃣ SYNC Momentum → HubSpot
+    // -------------------------
+    console.log("\n=== SYNCING MOMENTUM → HUBSPOT ===");
 
-  const companies = await fetchMomentumCustomers(token);
-  console.log("Companies fetched from Momentum:", companies.length);
+    const momentumCompanies = await fetchMomentumCustomers(token);
+    console.log("Momentum companies:", momentumCompanies.length);
 
-  for (const comp of companies) {
-  // console.log("comp", comp);
+    // throw new Error("stop");
 
-  try {
-    console.log(`\nProcessing Company: ${comp.commercialName} | SourceID: ${comp.databaseId}`);
-
-    // 1. Check if company already exists in HubSpot
-    const existing = await searchCompanyBySourceId(comp.databaseId);
-
-    // if (existing.results.length > 0) {
-    //   console.log(`✔ Already exists: ${existing.results[0].properties.name}`);
-    //   continue;
-    // }
-
-    // 2. Create the company
-    const newCompany = await createHubspotCompany(comp, token);
-
-        // get contact from momentum
-    const contacts = await getMomentumInsuredContacts(token, comp.databaseId);
-    console.log("Contacts fetched from Momentum:", contacts[0].databaseId);
-
-    
-    console.log("➕ Created new HubSpot Company:", newCompany.properties.name);
-
-    // seach contact by sourceId,deduplication logic
-     const existingContact = await searchContactBySourceId(comp.databaseId);
-     if (existingContact) {
-       console.log(`✔ Already exists: ${existingContact.properties.firstname} ${existingContact.properties.lastname}`);
-       continue;
-     }  
-
-
-    // create contact in hubspot 
-    const newContact = await createHubspotContact(contacts);
-    console.log("Contact created successfully in HubSpot:", newContact.id);
-    
-    // associate contact to company
-    const associateResponse = await associateCompanyToContact(newCompany.id, newContact.id);
-    console.log("Association created successfully:", associateResponse);
-
-
-    throw new Error('Testing ');
-
-  } catch (err) {
-    console.error(`❌ Error syncing company: `, err.message);
-    // continue; // continue loop instead of stopping
-  }
-}
-    
-     
-
-    // Loop through contacts
-    for (const contact of hubspotContacts) {
+    for (const mc of momentumCompanies) {
       try {
-        // console.log("Syncing contact:", contact);
-        
-        // Sync contact to Momentum as contact
-        // const momentumContact = await insertInsuredInMomentum(contact, token);
-        // console.log("Contact synced successfully to Momentum:", momentumContact);
-        
+        console.log(`\nCompany: ${mc.commercialName}`);
+        // throw new Error("stop");
 
-      } catch (error) {
-        console.error(
-          "Error syncing contact to Momentum:",
-          error.message
+        // 1. Check if exists
+        let existingCompany = await searchCompanyBySourceId(
+          mc.databaseId,
+          mc.commercialName
         );
-        return;
-        // continue; // move to next contact instead of stopping
+        if (existingCompany) {
+          console.log("✔ Company already exists in HubSpot");
+        } else {
+          // 2. Create company
+          existingCompany = await createHubspotCompany(mc);
+          console.log("➕ Company created in HubSpot");
+        }
+
+        const companyId = existingCompany.id; //  Company id
+
+        // 3. Fetch contacts for that company
+        const momentumContacts = await getMomentumInsuredContacts(
+          token,
+          mc.databaseId
+        );
+
+        for (const ct of momentumContacts) {
+          try {
+            // console.log(`Contact: }`,ct);
+            // 4. Check if contact exists
+
+            let conatctid = null;
+
+            const existingContact = await searchContactByEmail(
+              ct.businessEMail
+            );
+            if (existingContact) {
+              console.log(`✔ Contact exists:`, existingContact);
+              conatctid = existingContact.id;
+              // Update contact here
+              const updatedContact = await updateHubspotContact(ct, conatctid);
+              console.log("✔ Contact updated:", updatedContact.id);
+            } else {
+              // 5. Create HubSpot contact
+              const newCt = await createHubspotContact(ct);
+              console.log("➕ Contact created:", newCt.id);
+              conatctid = newCt.id;
+            }
+
+            // 6. Associate
+            const associated = await associateCompanyToContact(
+              companyId,
+              conatctid
+            );
+            console.log("✔ Associate contact to company:", associated);
+            console.log("✔ cONTACTID", conatctid);
+            console.log("✔ companyId", companyId);
+
+            throw new Error("stop associateCompanyToContact "); //
+          } catch (error) {
+            logger.error("❌ Error with contact:", error);
+          }
+        }
+      } catch (err) {
+        console.error("❌ Error with company:", err.message);
+        break; // remember to remove this
       }
     }
 
-    // If you want to enable token logic later:
-    // const accessToken = await getAccessToken();
-      
-    // Sync all HubSpot companies
+    // -------------------------
+    // 2️⃣ SYNC HubSpot → Momentum
+    // -------------------------
+    console.log("\n=== SYNCING HUBSPOT Contact → MOMENTUM Contact ===");
 
-    console.log("Fetching all HubSpot companies...");
+    const hubspotContacts = await getHubspotContacts();
+    console.log("HubSpot contacts:", hubspotContacts.length);
 
-    const allCompanies = await getAllHubspotCompanies();
+    // for (const hc of hubspotContacts) {
+    //   try {
+    //     const synced = await insertInsuredInMomentum(hc, token);
+    //     console.log("✔ Synced to Momentum:", synced);
+    //   } catch (err) {
+    //     console.error("❌ Contact sync failed:", err.message);
+    //   }
+    // }
 
-    console.log("Total companies found:", allCompanies.length);
-
-    for (const comp of allCompanies) {
-      console.log("Company:", comp.properties.name);
-      break;
-    }
-
+    console.log("\n=== SYNC COMPLETE ===");
   } catch (error) {
-    console.error("Error fetching HubSpot contacts:", error.message);
-    
+    console.error("❌ Fatal sync error:", error.message);
   }
 }
 
-
-
-
-export { hubspotToMomentumsync,};
+export { hubspotToMomentumsync };
