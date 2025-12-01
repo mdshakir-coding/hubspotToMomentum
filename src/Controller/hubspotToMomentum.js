@@ -86,8 +86,9 @@ async function hubspotToMomentumsync() {
               conatctid
             );
             console.log("✔ Associate contact to company:", associated);
-            console.log("✔ cONTACTID", conatctid);
+            console.log("✔ CONTACTID", conatctid);
             console.log("✔ companyId", companyId);
+            
 
             throw new Error("stop associateCompanyToContact "); //
           } catch (error) {
@@ -107,7 +108,7 @@ async function hubspotToMomentumsync() {
 
     const hubspotContacts = await getHubspotContacts();
     console.log("HubSpot contacts:", hubspotContacts.length);
-
+  
     // for (const hc of hubspotContacts) {
     //   try {
     //     const synced = await insertInsuredInMomentum(hc, token);

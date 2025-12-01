@@ -17,52 +17,55 @@ const hubspot = axios.create({
 // ---------------------
 // GET CONTACTS
 // ---------------------
-async function getHubspotContacts(limit = 100) {
-  let contacts = [];
-  let after = undefined;
+// async function getHubspotContacts(limit = 100) {
+//   let contacts = [];
+//   let after = undefined;
 
-  try {
-    while (true) {
-      const params = {
-        limit,
-        properties: ["firstname", "lastname", "email","address","phone","city","state","zip"],
-        ...(after && { after }),
-      };
+//   try {
+//     while (true) {
+//       const params = {
+//         limit,
+//         properties: ["firstname", "lastname", "email","address","phone","city","state","zip"],
+//         ...(after && { after }),
+//       };
 
-      const response = await hubspot.get("contacts", { params });
-      const data = response.data;
+//       const response = await hubspot.get("contacts", { params });
+//       const data = response.data;
 
-      contacts.push(...data.results);
+//       contacts.push(...data.results);
 
-      logger.info(`Fetched ${data.results.length} contacts`);
+//       logger.info(`Fetched ${data.results.length} contacts`);
 
-       return contacts; 
+//       return contacts; 
 
-      if (data.paging?.next?.after) {
-        after = data.paging.next.after;
-      } else {
-        break;
-      }
-    }
+//       if (data.paging?.next?.after) {
+//         after = data.paging.next.after;
+//       } else {
+//         break;
+//       }
+//     }
 
-    logger.info(`Fetched ${contacts.length} HubSpot contacts`);
+//     logger.info(`Fetched ${contacts.length} HubSpot contacts`);
 
-    return contacts;
-  } catch (error) {
-    logger.error(
-      "Error fetching HubSpot contacts:",
-      error.response?.data || error.message
-    );
-    return [];
-  }
-}
+//     return contacts;
+//   } catch (error) {
+//     logger.error(
+//       "Error fetching HubSpot contacts:",
+//       error.response?.data || error.message
+//     );
+//     return [];
+//   }
+// }
 //-----------------------------------------------------+----------------------------------------------------------
 // Add Delta function
 
 // async function getHubspotContacts() {
 //   try {
 //     // Calculate timestamp 2 hours ago
-//     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+//     // const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+//     const threeDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+
 
 //     const payload = {
 //       filterGroups: [
@@ -71,7 +74,7 @@ async function getHubspotContacts(limit = 100) {
 //             {
 //               propertyName: "lastmodifieddate",
 //               operator: "GT",
-//               value: twoHoursAgo
+//               value: threeDaysAgo
 //             }
 //           ]
 //         }
@@ -92,6 +95,60 @@ async function getHubspotContacts(limit = 100) {
 //     return [];
 //   }
 // }
+
+// Delta and pagination
+async function getHubspotContacts() {
+  try {
+    // const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+    const payload = {
+      filterGroups: [
+        {
+          filters: [
+            {
+              propertyName: "lastmodifieddate",
+              operator: "GT",
+              value: twelveHoursAgo
+            }
+          ]
+        }
+      ],
+      properties: ["firstname", "lastname", "email", "address", "phone", "city", "state", "zip"],
+      limit: 100
+    };
+
+    let allContacts = [];
+    let hasMore = true;
+    let after = undefined;
+
+    while (hasMore) {
+      if (after) payload.after = after;
+
+      const response = await hubspot.post("contacts/search", payload);
+
+      const results = response.data.results || [];
+      allContacts.push(...results);
+
+      console.log(`Fetched ${allContacts.length} contacts so far...`);
+
+      // Check pagination
+      if (response.data.paging?.next?.after) {
+        after = response.data.paging.next.after;
+      } else {
+        hasMore = false; // No more pages
+      }
+    }
+
+    logger.info(`Fetched ${allContacts.length} contacts`);
+
+    return allContacts;
+  } catch (error) {
+    logger.error("Error fetching delta contacts:", error.response?.data || error.message);
+    return [];
+  }
+}
+
 
 //-----------------------------------------------------+----------------------------------------------------------
 

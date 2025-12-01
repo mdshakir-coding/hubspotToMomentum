@@ -7,14 +7,12 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/momentum.js"
+    "start": "node -r dotenv/config src/momentum.js"
   },
   "dependencies": {
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "expess": "^0.0.1-security",
-    "express": "^5.1.0",
-    "winston": "^3.18.3",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston": "^3.18.3"
   }
 }
