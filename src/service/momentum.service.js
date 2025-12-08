@@ -197,7 +197,7 @@ async function PutCompanyInMomentum(token, companyData) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${HUBSPOT_API_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
       // Add cookie header only if required by your environment
       // 'Cookie': 'ARRAffinity=your_affinity_cookie; ARRAffinitySameSite=your_affinity_cookie'
     },
