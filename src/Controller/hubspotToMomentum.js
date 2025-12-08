@@ -14,6 +14,7 @@ import {
   insertInsuredInMomentum,
   searchContactByEmail,
   updateHubspotContact,
+  
   logger,
 } from "../index.js";
 
@@ -31,14 +32,88 @@ async function hubspotToMomentumsync() {
 
     // throw new Error("stop");
 
-    for (const mc of momentumCompanies) {
+
+    // for (const mc of momentumCompanies) {
+    //   try {
+    //     console.log(`\nCompany: ${JSON.stringify(mc)}`);
+    //     // throw new Error("stop");
+
+    //     // 1. Check if exists
+    //     let existingCompany = await searchCompanyBySourceId(
+    //       mc.id,
+    //       mc.commercialName
+    //     );
+    //     if (existingCompany) {
+    //       console.log("✔ Company already exists in HubSpot");
+    //     } else {
+    //       // 2. Create company
+    //       existingCompany = await createHubspotCompany(mc);
+    //       console.log("➕ Company created in HubSpot");
+    //     }
+
+    //     const companyId = existingCompany.id; //  Company id
+
+    //     // 3. Fetch contacts for that company
+    //     const momentumContacts = await getMomentumInsuredContacts(
+    //       token,
+    //       mc.databaseId
+    //     );
+
+    //     for (const ct of momentumContacts) {
+    //       try {
+    //         // console.log(`Contact: }`,ct);
+    //         // 4. Check if contact exists
+
+    //         let conatctid = null;
+
+    //         const existingContact = await searchContactByEmail(
+    //           ct.businessEMail
+    //         );
+    //         if (existingContact) {
+    //           console.log(`✔ Contact exists:`, existingContact);
+    //           conatctid = existingContact.id;
+    //           // Update contact here
+    //           const updatedContact = await updateHubspotContact(ct, conatctid);
+    //           console.log("✔ Contact updated:", updatedContact.id);
+    //         } else {
+    //           // 5. Create HubSpot contact
+    //           const newCt = await createHubspotContact(ct);
+    //           console.log("➕ Contact created:", newCt.id);
+    //           conatctid = newCt.id;
+    //         }
+
+    //         // 6. Associate
+    //         const associated = await associateCompanyToContact(
+    //           companyId,
+    //           conatctid
+    //         );
+    //         console.log("✔ Associate contact to company:", associated);
+    //         console.log("✔ CONTACTID", conatctid);
+    //         console.log("✔ companyId", companyId);
+            
+
+    //         throw new Error("stop associateCompanyToContact "); //
+    //       } catch (error) {
+    //         logger.error("❌ Error with contact:", error);
+    //         break; //todo remove after testing
+    //       }
+    //     }
+    //   } catch (err) {
+    //     console.error("❌ Error with company:", err.message);
+    //     break; // remember to remove this
+    //   }
+    // }
+
+
+
+for (const mc of momentumCompanies) {
       try {
-        console.log(`\nCompany: ${mc.commercialName}`);
+        console.log(`\nCompany: ${JSON.stringify(mc)}`);
         // throw new Error("stop");
 
         // 1. Check if exists
         let existingCompany = await searchCompanyBySourceId(
-          mc.databaseId,
+          mc.id,
           mc.commercialName
         );
         if (existingCompany) {
@@ -54,8 +129,11 @@ async function hubspotToMomentumsync() {
         // 3. Fetch contacts for that company
         const momentumContacts = await getMomentumInsuredContacts(
           token,
-          mc.databaseId
+          mc.id
         );
+
+        // console.log ("momentumContacts", momentumContacts);
+        // throw new Error("stop");
 
         for (const ct of momentumContacts) {
           try {
@@ -90,16 +168,23 @@ async function hubspotToMomentumsync() {
             console.log("✔ companyId", companyId);
             
 
-            throw new Error("stop associateCompanyToContact "); //
+            // throw new Error("stop associateCompanyToContact "); //
           } catch (error) {
             logger.error("❌ Error with contact:", error);
+            // break; //todo remove after testing
           }
         }
       } catch (err) {
         console.error("❌ Error with company:", err.message);
-        break; // remember to remove this
+        // break; // remember to remove this
       }
     }
+
+
+
+
+
+    // return; //todo remove after testing
 
     // -------------------------
     // 2️⃣ SYNC HubSpot → Momentum

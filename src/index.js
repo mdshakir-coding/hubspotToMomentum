@@ -12,7 +12,8 @@ import {
   fetchMomentumCustomers,
   getMomentumInsuredContacts,
   // createCompanyInMomentum,
-  PutCompanyInMomentum
+  PutCompanyInMomentum,
+  fetchAllCustomerToMomentum
 } from "./service/momentum.service.js";
 
 import { hubspotToMomentumsync } from "./Controller/hubspotToMomentum.js";
@@ -41,6 +42,7 @@ export {
   getAllHubspotCompanies,
   PutCompanyInMomentum,
   searchContactByEmail,
-  updateHubspotContact
+  updateHubspotContact,
+  fetchAllCustomerToMomentum
 
 };
