@@ -21,6 +21,8 @@ import{createHubspotContact}from "./service/hubspot.js"
 import{searchContactBySourceId}from "./service/hubspot.js"
 import{getAllHubspotCompanies}from "./service/hubspot.js"
 import{searchContactByEmail}from "./service/hubspot.js"
+import{getAllCompanies}from "./service/hubspot.js"
+import{getAllContacts}from "./service/hubspot.js"
  //-----------------------------------+------------------------------------------//
 export { 
   app,
@@ -43,6 +45,9 @@ export {
   PutCompanyInMomentum,
   searchContactByEmail,
   updateHubspotContact,
-  fetchAllCustomerToMomentum
+  fetchAllCustomerToMomentum,
+  getAllCompanies,
+  getAllContacts,
+
 
 };

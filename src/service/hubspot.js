@@ -755,10 +755,91 @@ async function updateHubspotContact(contactData, contactId) {
 }
 
 
+// Synced Get All Contacts from Hubspot
+
+
+async function getAllContacts() {
+  try {
+    let contacts = [];
+    let after = undefined;  // for pagination
+
+    do {
+      const response = await axios.get(
+        `https://api.hubapi.com/crm/v3/objects/contacts`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          params: {
+            limit: 100,  // max 100 per page
+            after: after,
+            properties: "email,firstname,lastname,phone", // specify desired properties
+          },
+        }
+      );
+
+      const data = response.data;
+      contacts = contacts.concat(data.results);
+      return contacts; // todo remove after testing
+
+      after = data.paging?.next?.after;
+
+      return contacts; // ✅ ALWAYS return array
+    } while (after);
+
+    return contacts;
+  } catch (error) {
+    console.error("Error fetching contacts from HubSpot:", error.response?.data || error.message);
+    return null;
+  }
+}
+
+
+// Synced  Get All company from Hubspot
+
+async function getAllCompanies() {
+  try {
+    let companies = [];
+    let after = undefined;
+
+    do {
+      const response = await axios.get(
+        `https://api.hubapi.com/crm/v3/objects/companies`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          params: {
+            limit: 100,      // Max 100 per page
+            after: after,    // Cursor for pagination
+            properties: "name,domain,industry,phone,address", // Specify properties to retrieve
+          },
+        }
+      );
+
+      const data = response.data;
+      companies = companies.concat(data.results);
+      return companies; // todo remove after testing
+
+      after = data.paging?.next?.after;
+        return companies; // ✅ ALWAYS return array
+    } while (after);
+
+    return companies;
+  } catch (error) {
+    console.error("Error fetching companies from HubSpot:", error.response?.data || error.message);
+    return null;
+  }
+}
+
+
+
 
 
 
 
 export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createHubspotCompany,associateCompanyToContact
 , getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,
-getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,};
+getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies};

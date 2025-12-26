@@ -14,7 +14,6 @@ import {
   insertInsuredInMomentum,
   searchContactByEmail,
   updateHubspotContact,
-  
   logger,
 } from "../index.js";
 
@@ -31,7 +30,6 @@ async function hubspotToMomentumsync() {
     console.log("Momentum companies:", momentumCompanies.length);
 
     // throw new Error("stop");
-
 
     // for (const mc of momentumCompanies) {
     //   try {
@@ -90,7 +88,6 @@ async function hubspotToMomentumsync() {
     //         console.log("✔ Associate contact to company:", associated);
     //         console.log("✔ CONTACTID", conatctid);
     //         console.log("✔ companyId", companyId);
-            
 
     //         throw new Error("stop associateCompanyToContact "); //
     //       } catch (error) {
@@ -104,9 +101,7 @@ async function hubspotToMomentumsync() {
     //   }
     // }
 
-
-
-for (const mc of momentumCompanies) {
+    for (const mc of momentumCompanies) {
       try {
         console.log(`\nCompany: ${JSON.stringify(mc)}`);
         // throw new Error("stop");
@@ -127,10 +122,7 @@ for (const mc of momentumCompanies) {
         const companyId = existingCompany.id; //  Company id
 
         // 3. Fetch contacts for that company
-        const momentumContacts = await getMomentumInsuredContacts(
-          token,
-          mc.id
-        );
+        const momentumContacts = await getMomentumInsuredContacts(token, mc.id);
 
         // console.log ("momentumContacts", momentumContacts);
         // throw new Error("stop");
@@ -166,7 +158,6 @@ for (const mc of momentumCompanies) {
             console.log("✔ Associate contact to company:", associated);
             console.log("✔ CONTACTID", conatctid);
             console.log("✔ companyId", companyId);
-            
 
             // throw new Error("stop associateCompanyToContact "); //
           } catch (error) {
@@ -180,10 +171,6 @@ for (const mc of momentumCompanies) {
       }
     }
 
-
-
-
-
     // return; //todo remove after testing
 
     // -------------------------
@@ -193,7 +180,7 @@ for (const mc of momentumCompanies) {
 
     const hubspotContacts = await getHubspotContacts();
     console.log("HubSpot contacts:", hubspotContacts.length);
-  
+
     // for (const hc of hubspotContacts) {
     //   try {
     //     const synced = await insertInsuredInMomentum(hc, token);
