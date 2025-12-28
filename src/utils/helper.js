@@ -1,17 +1,3 @@
-// for company Payload
-
-
-// function buildMomentumCompanyPayload(hubspotCompany) {
-//   return {
-//     commercialName: hubspotCompany.properties?.name || null,
-//     Email: hubspotCompany.properties?.email || null,
-//     Phone: hubspotCompany.properties?.phone || null,
-//     Address1: hubspotCompany.properties?.address || null,
-//     City: hubspotCompany.properties?.city || null,
-//     State: hubspotCompany.properties?.state || null,
-//     Zip: hubspotCompany.properties?.zip || null
-//   };
-// }
 
 function buildMomentumCompanyPayload(hubspotCompany) {
   const props = hubspotCompany.properties || {};
@@ -26,8 +12,6 @@ function buildMomentumCompanyPayload(hubspotCompany) {
     Zip: props.zip || null
   };
 }
-
-
 
 
 

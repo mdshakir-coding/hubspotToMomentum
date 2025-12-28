@@ -1,6 +1,9 @@
 import { logger, getAllCompanies, getAllContacts } from "../index.js";
 import { buildMomentumCompanyPayload } from "../utils/helper.js";
 import { buildMomentumContactPayload } from "../utils/helper.js";
+import{insertNowCertsCompany} from "../service/momentum.service.js";
+import { insertNowCertsContacts } from "../service/momentum.service.js";
+
 
 async function syncHubspotToMomentum() {
   try {

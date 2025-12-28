@@ -332,6 +332,64 @@ async function fetchAllCustomerToMomentum(token, maxId = 5000) {
   return unique;
 }
 
+// Insert NowCerts Comapny 
+
+
+ async function insertNowCertsCompany(payload) {
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Insured/Insert",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error inserting insured:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+
+// Insert Nowcerts Contacts
+
+async function insertNowCertsContacts(payload) {
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Insured/Insert",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "NowCerts Insured Insert Error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+
+
+
+
+
+
 export {
   getAccessToken,
   insertInsuredInMomentum,
@@ -340,4 +398,6 @@ export {
   getMomentumInsuredContacts,
   PutCompanyInMomentum,
   fetchAllCustomerToMomentum,
+  insertNowCertsCompany,
+  insertNowCertsContacts,
 };
