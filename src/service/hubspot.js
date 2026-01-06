@@ -246,6 +246,7 @@ async function getHubspotCompanies(limit = 100) {
 
 async function createCompanyInMomentum(companyData, accessToken) {
   try {
+
     const response = await axios.post(
       "https://api.nowcerts.com/api/Insured/Insert",
       companyData,
@@ -258,7 +259,7 @@ async function createCompanyInMomentum(companyData, accessToken) {
     );
 
     console.log("Company created successfully in Momentum");
-    return response.data;
+    return response.data.results;
 
   } catch (error) {
     console.error(
@@ -814,7 +815,7 @@ async function getAllCompanies() {
           params: {
             limit: 100,      // Max 100 per page
             after: after,    // Cursor for pagination
-            properties: "name,domain,industry,phone,address", // Specify properties to retrieve
+            properties: "name,domain,industry,phone,address,sync_to_momentum", // Specify properties to retrieve
           },
         }
       );
@@ -834,7 +835,141 @@ async function getAllCompanies() {
   }
 }
 
+// search Comapny by name in hubspot
 
+async function searchCompanyByName(companyName) {
+  if (!companyName) return [];
+
+  const payload = {
+    filterGroups: [
+      {
+        filters: [
+          {
+            propertyName: "name",
+            operator: "EQ",
+            value: companyName,
+          },
+        ],
+      },
+    ],
+    limit: 10,
+  };
+
+  try {
+    const response = await axios.post(
+      `https://api.hubapi.com/crm/v3/objects/companies/search`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data.results || [];
+  } catch (error) {
+    console.error(
+      "❌ Error searching company by name:",
+      error.response?.data || error.message
+    );
+    return [];
+  }
+}
+
+
+// company create function in hubspot
+
+async function createCompanyInHubSpot(properties) {
+  if (!properties || Object.keys(properties).length === 0) {
+    console.error("❌ No properties provided for company creation");
+  }
+
+  const payload = {
+    properties,
+  };
+
+  try {
+    const response = await axios.post(
+      `https://api.hubapi.com/crm/v3/objects/companies`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error creating company:",
+      error.response?.data || error.message
+    );
+    return {};
+  }
+}
+// Update company in hubspot
+
+async function updateCompanyInHubSpot(companyId, properties) {
+  if (!companyId) throw new Error("Company ID is required");
+  if (!properties || Object.keys(properties).length === 0) {
+    throw new Error("Update properties are required");
+  }
+
+  const payload = {
+    properties,
+  };
+
+  try {
+    const response = await axios.patch(
+      `https://api.hubapi.com/crm/v3/objects/companies/${companyId}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error updating company:",
+      error.response?.data || error.message
+    );
+    return {};
+  }
+}
+
+// search contacts in momentum
+
+async function createContactInMomentum(searchPayload, accessToken) {
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Contact/Search",
+      searchPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    console.log("Contact search successful in Momentum");
+    return response.data.results || response.data;
+
+  } catch (error) {
+    console.error(
+      "Error searching contact in Momentum:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
 
 
 
@@ -842,4 +977,5 @@ async function getAllCompanies() {
 
 export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createHubspotCompany,associateCompanyToContact
 , getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,
-getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies};
+getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies,
+searchCompanyByName,createCompanyInHubSpot,updateCompanyInHubSpot,createContactInMomentum};

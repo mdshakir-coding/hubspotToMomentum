@@ -1,15 +1,15 @@
 
 function buildMomentumCompanyPayload(hubspotCompany) {
-  const props = hubspotCompany.properties || {};
+  const data = hubspotCompany.properties || {};
 
   return {
-    commercialName: props.name || null,
-    Email: props.email || null,      // must be custom property in HubSpot
-    Phone: props.phone || null,
-    Address1: props.address || null,
-    City: props.city || null,
-    State: props.state || null,
-    Zip: props.zip || null
+    commercialName: data.name || null,
+    Email: data.email || null,      // must be custom property in HubSpot
+    Phone: data.phone || null,
+    Address1: data.address || null,
+    City: data.city || null,
+    State: data.state || null,
+    Zip: data.zip || null
   };
 }
 
@@ -17,20 +17,20 @@ function buildMomentumCompanyPayload(hubspotCompany) {
 
 // for Contact Payload
 
+
 function buildMomentumContactPayload(hubspotContact) {
+  const data = hubspotContact.properties || {};
   return {
-    FirstName: hubspotContact.properties?.firstname || null,
-    LastName: hubspotContact.properties?.lastname || null,
-    Email: hubspotContact.properties?.email || null,
-    Phone: hubspotContact.properties?.phone || null,
-    Address1: hubspotContact.properties?.address || null,
-    City: hubspotContact.properties?.city || null,
-    State: hubspotContact.properties?.state || null,
-    Zip: hubspotContact.properties?.zip || null
+    FirstName: data.firstname || null,
+    LastName: data.lastname || null,
+    Email: data.email || null,
+    Phone: data.phone || null,
+    Address1: data.address || null,
+    City: data.city || null,
+    State: data.state || null,
+    Zip: data.zip || null
   };
 }
-
-
 
 
 

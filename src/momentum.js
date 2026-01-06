@@ -3,6 +3,7 @@ import "dotenv/config";
 import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,
   hubspotToMomentumsync,fetchAllCustomerToMomentum} from "./index.js";
   import { syncHubspotToMomentum } from "./Controller/sycHubspotToMomentum.js";
+  import { syncContactMomentum } from "./Controller/syncContactMomentum.js";
   
 import { getAccessToken } from "./service/momentum.service.js";
 console.log("Loaded Token:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
@@ -21,6 +22,7 @@ app.listen(PORT, async function () {
     //  const allcontacts = await fetchAllCustomerToMomentum(token);
     //  console.log("final Customers from Momentum:", allcontacts.length);
     syncHubspotToMomentum();
+    // syncContactMomentum();
   
     
     

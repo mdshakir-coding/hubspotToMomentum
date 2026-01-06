@@ -384,6 +384,137 @@ async function insertNowCertsContacts(payload) {
   }
 }
 
+// search company in momentum from delta
+
+ async function getCompaniesModifiedLast1Hour() {
+  try {
+    // ⏱️ Calculate 1 hour ago (ISO format)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+    let companies = [];
+    let after;
+
+    do {
+      const response = await axios.post(
+        "https://api.hubapi.com/crm/v3/objects/companies/search",
+        {
+          filterGroups: [
+            {
+              filters: [
+                {
+                  propertyName: "hs_lastmodifieddate",
+                  operator: "GTE",
+                  value: oneHourAgo,
+                },
+                {
+                  propertyName: "sync_to_momentum",
+                  operator: "EQ",
+                  value: "yes"
+                }
+              ],
+            },
+          ],
+          properties: [
+            "name",
+            "domain",
+            "phone",
+            "sync_to_momentum",
+            "hs_lastmodifieddate",
+          ],
+          limit: 100,
+          after,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      companies.push(...response.data.results);
+      return companies; // todo after remove testing
+      
+      after = response.data.paging?.next?.after;
+
+    } while (after);
+
+    return companies;
+
+  } catch (error) {
+    console.error(
+      "❌ Error fetching HubSpot companies (last 1 hour):",
+      error.response?.data || error.message
+    );
+    return [];
+  }
+}
+
+// search contacts in momentum from delta
+ async function getContactsModifiedLast1Hour() {
+  try {
+    // ⏱️ 1 hour ago (UTC, ISO)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+    let contacts = [];
+    let after;
+
+    do {
+      const response = await axios.post(
+        "https://api.hubapi.com/crm/v3/objects/contacts/search",
+        {
+          filterGroups: [
+            {
+              filters: [
+                {
+                  propertyName: "sync_to_momentum",
+                  operator: "EQ",
+                  value: "yes",
+                },
+                {
+                  propertyName: "lastmodifieddate",
+                  operator: "GTE",
+                  value: oneHourAgo,
+                },
+              ],
+            },
+          ],
+          properties: [
+            "firstname",
+            "lastname",
+            "email",
+            "phone",
+            "sync_to_momentum",
+            "lastmodifieddate",
+          ],
+          limit: 100,
+          after,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      contacts.push(...response.data.results);
+      return contacts; //todo remove after Testing
+      after = response.data.paging?.next?.after;
+
+    } while (after);
+
+    return contacts;
+
+  } catch (error) {
+    console.error(
+      "❌ Error fetching HubSpot contacts (last 1 hour):",
+      error.response?.data || error.message
+    );
+    return [];
+  }
+}
+
 
 
 
@@ -400,4 +531,6 @@ export {
   fetchAllCustomerToMomentum,
   insertNowCertsCompany,
   insertNowCertsContacts,
+  getCompaniesModifiedLast1Hour,
+  getContactsModifiedLast1Hour,
 };
