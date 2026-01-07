@@ -469,13 +469,13 @@ async function insertNowCertsContacts(payload) {
                 {
                   propertyName: "sync_to_momentum",
                   operator: "EQ",
-                  value: "yes",
+                  value: "no",
                 },
-                {
-                  propertyName: "lastmodifieddate",
-                  operator: "GTE",
-                  value: oneHourAgo,
-                },
+                // {
+                //   propertyName: "lastmodifieddate",
+                //   operator: "GTE",
+                //   value: oneHourAgo,
+                // },
               ],
             },
           ],
@@ -486,6 +486,7 @@ async function insertNowCertsContacts(payload) {
             "phone",
             "sync_to_momentum",
             "lastmodifieddate",
+            "souceid",
           ],
           limit: 100,
           after,
@@ -515,7 +516,50 @@ async function insertNowCertsContacts(payload) {
   }
 }
 
+// search contact 
 
+async function searchContractBySourceId(sourceId) {
+  if (!sourceId) return {};
+
+  try {
+    const url = "https://api.hubapi.com/crm/v3/objects/contracts/search";
+
+    const payload = {
+      filterGroups: [
+        {
+          filters: [
+            {
+              propertyName: "sourceid",
+              operator: "EQ",
+              value: sourceId,
+            },
+          ],
+        },
+      ],
+      properties: [
+        "sourceid",
+        
+      ],
+      limit: 10,
+      after: 0,
+    };
+
+    const response = await axios.post(url, payload, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+      },
+    });
+
+    return response.data.results[0];
+  } catch (error) {
+    console.error(
+      "Error searching deal by sourceid:",
+      error.response?.data || error.message
+    );
+    return {};
+  }
+}
 
 
 
@@ -533,4 +577,5 @@ export {
   insertNowCertsContacts,
   getCompaniesModifiedLast1Hour,
   getContactsModifiedLast1Hour,
+  searchContractBySourceId,
 };

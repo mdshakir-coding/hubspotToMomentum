@@ -25,6 +25,7 @@ import{getAllHubspotCompanies}from "./service/hubspot.js"
 import{searchContactByEmail}from "./service/hubspot.js"
 import{getAllCompanies}from "./service/hubspot.js"
 import{getAllContacts}from "./service/hubspot.js"
+import{searchContractBySourceId}from "./service/momentum.service.js"
  //-----------------------------------+------------------------------------------//
 export { 
   app,
@@ -52,6 +53,7 @@ export {
   getAllContacts,
   insertNowCertsCompany,
   insertNowCertsContacts,
+  searchContractBySourceId,
 
 
 };

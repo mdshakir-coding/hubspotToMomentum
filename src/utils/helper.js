@@ -18,17 +18,19 @@ function buildMomentumCompanyPayload(hubspotCompany) {
 // for Contact Payload
 
 
-function buildMomentumContactPayload(hubspotContact) {
+function buildMomentumContactPayload(hubspotContact,hubspotCompany) {
   const data = hubspotContact.properties || {};
+  const data2 = hubspotCompany.properties || {};
   return {
-    FirstName: data.firstname || null,
-    LastName: data.lastname || null,
-    Email: data.email || null,
-    Phone: data.phone || null,
-    Address1: data.address || null,
-    City: data.city || null,
-    State: data.state || null,
-    Zip: data.zip || null
+    commercialName:data2?.name,
+    FirstName: data?.firstname || null,
+    LastName: data?.lastname || null,
+    Email: data?.email || null,
+    Phone: data?.phone || null,
+    Address1: data?.address || null,
+    City: data?.city || null,
+    State: data?.state || null,
+    Zip: data?.zip || null
   };
 }
 

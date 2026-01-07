@@ -782,11 +782,12 @@ async function getAllContacts() {
 
       const data = response.data;
       contacts = contacts.concat(data.results);
-      return contacts; // todo remove after testing
+      // return contacts; // todo remove after testing
+      console.log("Contacts:", contacts.length);
 
       after = data.paging?.next?.after;
 
-      return contacts; // ✅ ALWAYS return array
+      // return contacts; // ✅ ALWAYS return array
     } while (after);
 
     return contacts;
@@ -971,6 +972,37 @@ async function createContactInMomentum(searchPayload, accessToken) {
   }
 }
 
+//
+
+
+async function getAssociatedCompanyByContactId(contactId) {
+  if (!contactId) return null;
+
+  try {
+    const response = await axios.get(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}/associations/companies`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    // If company exists, return first (primary) one
+    if (response.data?.results?.length > 0) {
+      return response.data.results[0]; // { id, type }
+    }
+
+    return null; // No associated company
+  } catch (error) {
+    console.error(
+      "❌ Error fetching associated company:",
+      error?.response?.data || error.message
+    );
+    return null;
+  }
+}
 
 
 
@@ -978,4 +1010,5 @@ async function createContactInMomentum(searchPayload, accessToken) {
 export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createHubspotCompany,associateCompanyToContact
 , getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,
 getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies,
-searchCompanyByName,createCompanyInHubSpot,updateCompanyInHubSpot,createContactInMomentum};
+searchCompanyByName,createCompanyInHubSpot,updateCompanyInHubSpot,createContactInMomentum,
+getAssociatedCompanyByContactId};
