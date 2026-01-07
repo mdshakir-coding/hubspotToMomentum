@@ -782,7 +782,7 @@ async function getAllContacts() {
 
       const data = response.data;
       contacts = contacts.concat(data.results);
-      // return contacts; // todo remove after testing
+      return contacts; // todo remove after testing
       console.log("Contacts:", contacts.length);
 
       after = data.paging?.next?.after;
@@ -947,32 +947,71 @@ async function updateCompanyInHubSpot(companyId, properties) {
 
 // search contacts in momentum
 
+// async function createContactInMomentum(searchPayload) {
+//   if (!searchPayload) return null;
+//   try {
+//     const response = await axios.post(
+//       "https://api.nowcerts.com/api/Contact/Search",
+//       searchPayload,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//         },
+//       }
+//     );
+
+//     console.log("Contact search successful in Momentum");
+//     return response.data.results || response.data;
+
+//   } catch (error) {
+//     console.error(
+//       "Error searching contact in Momentum:",
+//       error.response?.data || error.message
+//     );
+//     return null;
+//   }
+// }
+
+//
+
 async function createContactInMomentum(searchPayload, accessToken) {
+  if (!searchPayload) return null;
+
   try {
     const response = await axios.post(
-      "https://api.nowcerts.com/api/Contact/Search",
+      "https://api.nowcerts.com/api/Insured/Insert",
       searchPayload,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+          Authorization: `Bearer ${accessToken}`
+        }
       }
     );
 
-    console.log("Contact search successful in Momentum");
-    return response.data.results || response.data;
+    console.log("✅ Contact search successful in Momentum");
+
+    // NowCerts may return array or object
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      return response.data[0];
+    }
+
+    if (response.data?.results?.length > 0) {
+      return response.data.results[0];
+    }
+
+    return response.data;
 
   } catch (error) {
     console.error(
-      "Error searching contact in Momentum:",
+      "❌ Error searching contact in Momentum:",
       error.response?.data || error.message
     );
-    throw error;
+    return null;
   }
 }
 
-//
 
 
 async function getAssociatedCompanyByContactId(contactId) {

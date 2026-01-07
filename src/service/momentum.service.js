@@ -469,8 +469,8 @@ async function insertNowCertsContacts(payload) {
                 {
                   propertyName: "sync_to_momentum",
                   operator: "EQ",
-                  value: "no",
-                },
+                  value: "Yes",
+                }
                 // {
                 //   propertyName: "lastmodifieddate",
                 //   operator: "GTE",
@@ -487,6 +487,10 @@ async function insertNowCertsContacts(payload) {
             "sync_to_momentum",
             "lastmodifieddate",
             "souceid",
+            "address",
+            "city",
+            "state",
+            "zip"
           ],
           limit: 100,
           after,
@@ -516,10 +520,10 @@ async function insertNowCertsContacts(payload) {
   }
 }
 
-// search contact 
+// search contact by sourceid
 
 async function searchContractBySourceId(sourceId) {
-  if (!sourceId) return {};
+  if (!sourceId) return null;
 
   try {
     const url = "https://api.hubapi.com/crm/v3/objects/contracts/search";
@@ -551,16 +555,85 @@ async function searchContractBySourceId(sourceId) {
       },
     });
 
-    return response.data.results[0];
+    return response.data.results[0] || null;
   } catch (error) {
     console.error(
       "Error searching deal by sourceid:",
       error.response?.data || error.message
     );
+    return null;
+  }
+}
+
+// Update function in contacts
+
+async function updateContactById(contactId, momentum) {
+ 
+  try {
+    if (!contactId || !momentum) {
+      // throw new Error("contactId and properties are required");
+      console.log("contactId and properties are required");
+      return {};
+    }
+    const payload = {
+      properties: {
+        sourceid: momentum?.insuredDatabaseId,
+      }
+    }
+
+    const response = await axios.patch(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    // console.log("✅ Contact updated successfully:", response.data.id);
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "❌ Error updating HubSpot contact:",
+      error?.response?.data || error.message
+    );
     return {};
   }
 }
 
+// get company by id
+
+async function getCompanyById(companyId,) {
+  try {
+    if (!companyId) {
+      console.log("Company ID is required");
+      return {};
+    }
+
+    const response = await axios.get(
+      `https://api.hubapi.com/crm/v3/objects/companies/${companyId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log("✅ Company fetched successfully:", response.data.id);
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "❌ Error fetching company:",
+      error?.response?.data || error.message
+    );
+    return {};
+  }
+}
 
 
 
@@ -578,4 +651,7 @@ export {
   getCompaniesModifiedLast1Hour,
   getContactsModifiedLast1Hour,
   searchContractBySourceId,
+  updateContactById,
+  getCompanyById,
+
 };
