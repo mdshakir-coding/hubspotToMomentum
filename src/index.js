@@ -2,7 +2,9 @@
 import "dotenv/config";
 
 import { app } from "./app.js"; 
-import { logger } from "./utils/winstonlogger.js";
+
+import{logger}from "./utils/logger.js"
+
 import { getHubspotContacts, getHubspotCompanies, createHubspotCompany, createCompanyInMomentum, 
     associateCompanyToContact, searchCompanyBySourceId, getAssociatedCompanies,updateHubspotContact } from "./service/hubspot.js";
 

@@ -15,8 +15,8 @@ async function syncContactMomentum() {
     // call the function
 
     // const contacts = await getAllContacts();
-    // console.log("final Contacts:", contacts.length);
-    // console.log("final Contacts:", contacts[0]);
+    // logger.info("final Contacts:", contacts.length);
+    // logger.info("final Contacts:", contacts[0]);
     // return;
 
     // call the Token
@@ -24,8 +24,9 @@ async function syncContactMomentum() {
 
     // caal the function
      const contacts = await getContactsModifiedLast1Hour();
-     console.log("final Contacts:", contacts.length);
-     console.log ("final Contacts:", contacts[0]);
+    logger.info("final Contacts:", contacts.length);
+    //  logger.info ("final Contacts:", contacts[0]);
+     logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
     //  return; //todo remove after testing
 
     for (const contact of contacts) {
@@ -36,16 +37,16 @@ async function syncContactMomentum() {
         //   // skip other contacts
         //   continue;
         // }
-        // console.log("Processing Contact:", contact);
+        // logger.info("Processing Contact:", contact);
         // return;
 
         if (contact.properties?.sync_to_momentum === "No" || contact.properties?.sync_to_momentum === null
           || contact.properties?.sync_to_momentum === undefined ) {
-            console.log ("Sync To momentum is no for Contact " , contact);
+            logger.info ("Sync To momentum is no for Contact " , contact);
             continue;
           }
 
-        // console.log("Contact ID:", contact);
+        // logger.info("Contact ID:", contact);
         // return;
         // search based on sorceid if exist continue
         const existingContact = await searchContractBySourceId(
@@ -53,7 +54,7 @@ async function syncContactMomentum() {
         );
 
         if (existingContact) {
-          console.log(
+          logger.info(
             "Contact already exists in Momentum:",
             existingContact.id
           );
@@ -65,43 +66,42 @@ async function syncContactMomentum() {
         const associatedCompany = await getAssociatedCompanyByContactId(
           contact.id
         );
-        console.log("Associated Company:", associatedCompany);
+      
+        logger.info(`Associated Company ${JSON.stringify(associatedCompany, null,2 )}`)
         if (!associatedCompany) {
-          console.log(
-            "No associated company found for contact ID:",
-            contact.id
-          );
+          logger.info(`No associated company found for contact ID:${contact.id}`);
           continue;
         }
+       
         
         let company = null;
 
         if (associatedCompany.id) {
           company = await getCompanyById(associatedCompany.id);
-          console.log("Company:", company);
+          logger.info(`Company ${JSON.stringify(company, null,2 )}`);
         }
-        console.log("Contact:", contact);
+        logger.info("Contact:", contact);
         const contactPayload = buildMomentumContactPayload(contact, company);
-        console.log(" Contact Payload", contactPayload);
+        logger.info(` Contact Payload ${JSON.stringify(contactPayload,null,2)}`);
         
         let contactMomentum = null;
         // // ✅ Create Contact in Momentum
         contactMomentum = await createContactInMomentum(contactPayload,accessToken);
-        console.log("➕ Contact created in Momentum:", contactMomentum);
+        logger.info(`Contact created in Momentum ${JSON.stringify(contactMomentum, null,2 )}`);
 
         // Update Function
 
         const updatedContact = await updateContactById(contact.id, contactMomentum);
-        console.log("Contact updated successfully:", updatedContact);
+        logger.info(`Contact updated successfully ${JSON.stringify(updatedContact, null,2 )}`);
 
-        return; // todo remove
+        // return; // todo remove after testing
       } catch (error) {
-        console.error("Error syncing HubSpot to Momentum:", error);
+        logger.error(`Error syncing HubSpot to Momentum:`, error);
       }
     }
-    console.log(" All contacts synced successfully.");
+    logger.info(" All contacts synced successfully.");
   } catch (error) {
-    console.error("Error syncing HubSpot to Momentum:", error);
+    logger.error(`Error syncing HubSpot to Momentum:`, error);
     return;
   }
 }
