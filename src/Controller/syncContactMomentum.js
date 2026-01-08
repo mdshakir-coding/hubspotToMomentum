@@ -89,8 +89,6 @@ async function syncContactMomentum() {
         contactMomentum = await createContactInMomentum(contactPayload,accessToken);
         console.log("➕ Contact created in Momentum:", contactMomentum);
 
-        // return;
-
         // Update Function
 
         const updatedContact = await updateContactById(contact.id, contactMomentum);
@@ -101,7 +99,7 @@ async function syncContactMomentum() {
         console.error("Error syncing HubSpot to Momentum:", error);
       }
     }
-    console.log("All contacts synced successfully.");
+    console.log(" All contacts synced successfully.");
   } catch (error) {
     console.error("Error syncing HubSpot to Momentum:", error);
     return;

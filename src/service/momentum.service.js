@@ -454,7 +454,7 @@ async function insertNowCertsContacts(payload) {
  async function getContactsModifiedLast1Hour() {
   try {
     // ⏱️ 1 hour ago (UTC, ISO)
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
 
     let contacts = [];
     let after;
