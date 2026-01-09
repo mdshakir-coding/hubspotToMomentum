@@ -19,6 +19,8 @@ import {
   fetchAllCustomerToMomentum,
   insertNowCertsCompany,
   insertNowCertsContacts,
+  fetchContactsWithSourceGroup,
+  insertInsuredContact,
 } from "./service/momentum.service.js";
 
 import { hubspotToMomentumsync } from "./Controller/hubspotToMomentum.js";
@@ -61,6 +63,8 @@ export {
   searchContractBySourceId,
   updateContactById,
   getCompanyById,
+  fetchContactsWithSourceGroup,
+  insertInsuredContact,
 
 
 };

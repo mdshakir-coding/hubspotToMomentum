@@ -4,12 +4,22 @@ import cron from "node-cron";
 let isRunning = false;
 let counter = 1;
 
-cron.schedule(" */1 * * * * *", async () => {
+// 1 Second 
+// cron.schedule(" */1 * * * * *", async () => {
+//     logger.info(`🚀 Cron started : ${counter}`);
+//     counter++;
+//     // await syncContactMomentum();
+//     // logger.info("✅ Cron finished");
+// });
+
+// 1 Hour 
+cron.schedule("0 0 */1 * * *", async () => {
     logger.info(`🚀 Cron started : ${counter}`);
     counter++;
     // await syncContactMomentum();
     // logger.info("✅ Cron finished");
 });
+
 
 
 

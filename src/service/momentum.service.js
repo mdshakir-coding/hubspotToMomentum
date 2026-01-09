@@ -635,6 +635,174 @@ async function getCompanyById(companyId,) {
   }
 }
 
+// fetch All contact with source group
+
+//  async function fetchContactsWithSourceGroup() {
+//     try {
+//         const response = await axios.post(
+//             `https://api.hubapi.com/crm/v3/objects/contacts/search`,
+//             {
+//                 filterGroups: [
+//                     {
+//                         filters: [
+//                             {
+//                                 propertyName: "source_group",
+//                                 operator: "HAS_PROPERTY"
+//                             }
+//                         ]
+//                     }
+//                 ],
+//                 properties: [
+//                     "firstname",
+//                     "lastname",
+//                     "email",
+//                     "source_group",
+//                     "sourceid",
+//                     "phone",
+//                     "address",
+//                     "city",
+//                     "state",
+//                     "zip"
+//                 ],
+//                 limit: 100
+//             },
+//             {
+//                 headers: {
+//                     Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//                     "Content-Type": "application/json"
+//                 }
+//             }
+//         );
+
+//         return response.data.results;
+//     } catch (error) {
+//         console.error(
+//             "Error fetching HubSpot contacts:",
+//             error.response?.data || error.message
+//         );
+//         throw error;
+//     }
+// }
+
+async function fetchContactsWithSourceGroup() {
+    const allContacts = [];
+    let after = null;
+    const limit = 100;
+
+    try {
+        do {
+            const response = await axios.post(
+                "https://api.hubapi.com/crm/v3/objects/contacts/search",
+                {
+                    filterGroups: [
+                        {
+                            filters: [
+                                {
+                                    propertyName: "source_group",
+                                    operator: "HAS_PROPERTY"
+                                }
+                            ]
+                        }
+                    ],
+                    properties: [
+                        "firstname",
+                        "lastname",
+                        "email",
+                        "source_group",
+                        "sourceid",
+                        "phone",
+                        "address",
+                        "city",
+                        "state",
+                        "zip"
+                    ],
+                    limit,
+                    ...(after && { after })
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+            const results = response.data.results || [];
+            allContacts.push(...results);
+            return allContacts; // todo remove after testing
+
+            // Pagination cursor
+            after = response.data.paging?.next?.after || null;
+
+        } while (after);
+
+        return allContacts;
+    } catch (error) {
+        console.error(
+            "Error fetching HubSpot contacts with pagination:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+}
+
+// search function in contact based on database id
+
+
+// async function insertInsuredContact(data,accessToken) {
+
+  
+//   try {
+//     const response = await axios.post(
+//       "https://api.nowcerts.com/api/Insured/Insert",
+//       data,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`, // Replace with your actual token
+//           "Content-Type": "application/json",
+//           Cookie: "ARRAffinity=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc; ARRAffinitySameSite=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc",
+//         },
+//       }
+//     );
+
+//     return response?.data;
+//   } catch (error) {
+//     console.error(
+//       "Error inserting insured record:",
+//       error.response?.data || error.message
+//     );
+//     return{};
+//   }
+// }
+
+
+async function insertInsuredContact(data, accessToken) {
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Insured/Insert",
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          Cookie:
+            "ARRAffinity=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc; ARRAffinitySameSite=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc",
+        },
+      }
+    );
+
+    return response?.data;
+  } catch (error) {
+    console.error(
+      "Error inserting insured record:",
+      error.response?.data || error.message
+    );
+   throw error;
+  }
+}
+
+
+
 
 
 
@@ -653,5 +821,8 @@ export {
   searchContractBySourceId,
   updateContactById,
   getCompanyById,
+  fetchContactsWithSourceGroup,
+  insertInsuredContact,
+  
 
 };

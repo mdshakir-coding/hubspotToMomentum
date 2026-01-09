@@ -28,7 +28,7 @@ app.listen(PORT, async function () {
     //  const allcontacts = await fetchAllCustomerToMomentum(token);
     //  console.log("final Customers from Momentum:", allcontacts.length);
     // syncHubspotToMomentum();
-    // syncContactMomentum();
+    syncContactMomentum();
   
     
     

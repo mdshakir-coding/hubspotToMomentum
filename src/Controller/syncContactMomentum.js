@@ -7,6 +7,8 @@ import { searchContractBySourceId } from "../service/momentum.service.js";
 import { getAssociatedCompanyByContactId } from "../service/hubspot.js";
 import { updateContactById } from "../service/momentum.service.js";
 import { getCompanyById } from "../service/momentum.service.js";
+import{fetchContactsWithSourceGroup}from "../service/momentum.service.js"
+import{insertInsuredContact}from "../service/momentum.service.js"
 
 // sync contacts in momentum
 
@@ -22,11 +24,17 @@ async function syncContactMomentum() {
     // call the Token
     const accessToken = await getAccessToken();
 
-    // caal the function
-     const contacts = await getContactsModifiedLast1Hour();
-    logger.info("final Contacts:", contacts.length);
-     logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
+    // caal the function for all contacts by syc_to_momentum
+    //  const contacts = await getContactsModifiedLast1Hour();
+    // logger.info("final Contacts:", contacts.length);
+    //  logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
     //  return; //todo remove after testing
+
+    // call the function for all contacts by sourceGroup
+    const contacts = await fetchContactsWithSourceGroup();
+    logger.info(`final Contacts:${JSON.stringify(contacts.length) }`);
+    // logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
+    // return;//todo remove after testing
 
     for (const contact of contacts) {
       try {
@@ -39,31 +47,33 @@ async function syncContactMomentum() {
         // logger.info("Processing Contact:", contact);
         // return;
 
-        if (contact.properties?.sync_to_momentum === "No" || contact.properties?.sync_to_momentum === null
-          || contact.properties?.sync_to_momentum === undefined ) {
-            logger.info ("Sync To momentum is no for Contact " , contact);
-            continue;
-          }
+        // if (contact.properties?.sync_to_momentum === "No" || contact.properties?.sync_to_momentum === null
+        //   || contact.properties?.sync_to_momentum === undefined ) {
+        //     logger.info ("Sync To momentum is no for Contact " , contact);
+        //     continue;
+        //   }
 
-        // logger.info("Contact ID:", contact);
-        // return;
-        // search based on sorceid if exist continue
-        const existingContact = await searchContractBySourceId(
-          contact?.properties?.sourceid
-        );
-
-        if (existingContact) {
-          logger.info(
-            "Contact already exists in Momentum:",
-            existingContact.id
-          );
-          continue;
-        }
         
+        // search based on sorceid if exist continue
+        // const existingContact = await searchContractBySourceId(
+        //   contact?.properties?.sourceid
+        // );
+
+        // if (existingContact) {
+        //   logger.info(
+        //     "Contact already exists in Momentum:",
+        //     existingContact.id
+        //   );
+        //   continue;
+        // }
+
+      
         // search associated company
 
+        logger.info(`Contact ${JSON.stringify(contact, null,2 )}`);
+
         const associatedCompany = await getAssociatedCompanyByContactId(
-          contact.id
+          contact?.id
         );
       
         logger.info(`Associated Company ${JSON.stringify(associatedCompany, null,2 )}`)
@@ -82,18 +92,21 @@ async function syncContactMomentum() {
         logger.info("Contact:", contact);
         const contactPayload = buildMomentumContactPayload(contact, company);
         logger.info(` Contact Payload ${JSON.stringify(contactPayload,null,2)}`);
-        
+
+
         let contactMomentum = null;
-        // // ✅ Create Contact in Momentum
-        contactMomentum = await createContactInMomentum(contactPayload,accessToken);
-        logger.info(`Contact created in Momentum ${JSON.stringify(contactMomentum, null,2 )}`);
-
+        // ✅ Create Contact in Momentum
+         contactMomentum = await createContactInMomentum(contactPayload,accessToken);
+         logger.info(`Contact created in Momentum ${JSON.stringify(contactMomentum, null,2 )}`);
+        
         // Update Function
-
         const updatedContact = await updateContactById(contact.id, contactMomentum);
         logger.info(`Contact updated successfully ${JSON.stringify(updatedContact, null,2 )}`);
 
-        // return; // todo remove after testing
+
+
+
+        return; // todo remove after testing
       } catch (error) {
         logger.error(`Error syncing HubSpot to Momentum:`, error);
       }
