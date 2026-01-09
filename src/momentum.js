@@ -7,7 +7,12 @@ import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMom
   import { syncContactMomentum } from "./Controller/syncContactMomentum.js";
   
 import { getAccessToken } from "./service/momentum.service.js";
+
+import "./crons/cronScheduler.js";
+
 console.log("Loaded Token:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
+
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,11 +24,11 @@ app.listen(PORT, async function () {
     // hubspotToMomentumsync();
     // const contact = await getHubspotContacts();
     // console.log("final Contacts:", contact.length);
-    const token = await getAccessToken();
+    // const token = await getAccessToken();
     //  const allcontacts = await fetchAllCustomerToMomentum(token);
     //  console.log("final Customers from Momentum:", allcontacts.length);
     // syncHubspotToMomentum();
-    syncContactMomentum();
+    // syncContactMomentum();
   
     
     
