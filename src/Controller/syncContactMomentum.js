@@ -25,7 +25,6 @@ async function syncContactMomentum() {
     // caal the function
      const contacts = await getContactsModifiedLast1Hour();
     logger.info("final Contacts:", contacts.length);
-    //  logger.info ("final Contacts:", contacts[0]);
      logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
     //  return; //todo remove after testing
 

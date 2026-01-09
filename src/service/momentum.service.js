@@ -409,7 +409,7 @@ async function insertNowCertsContacts(payload) {
                 {
                   propertyName: "sync_to_momentum",
                   operator: "EQ",
-                  value: "yes"
+                  value: "Yes"
                 }
               ],
             },
