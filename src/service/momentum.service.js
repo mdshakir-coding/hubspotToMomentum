@@ -92,26 +92,30 @@ async function createOpportunityInMomentum(opportunityData, token) {
   }
 }
 
-// fetch customers
-// async function fetchMomentumCustomers(token, name = "Turner Homes LLC") {
+// fetch customers based on date
+
+// async function fetchMomentumCustomers(token) {
 //   try {
-//     const url = `https://api.nowcerts.com/api/Customers/GetCustomers?Name=${encodeURIComponent(
-//       name
-//     )}`;
+//     console.log("Fetching Customers from NowCerts");
+
+//     const url = 
+//       "https://api.nowcerts.com/api/InsuredDetailList" +
+//       "?$count=true" +
+//       "&$orderby=ChangeDate desc" +
+//       "&$skip=0" +
+//       "&$filter=ChangeDate ge 2025-12-03T12:00:00Z";  // EXACT same as curl
 
 //     const response = await axios.get(url, {
 //       headers: {
 //         Authorization: `Bearer ${token}`,
 //         Accept: "application/json",
-//         "Content-Type": "application/json",
 //       },
-
-//       // If you need cookies:
-//       // withCredentials: true
 //     });
 
-//     // console.log("NowCerts Customers Fetched:", response.data);
-//     return response.data;
+//     console.log("NowCerts Customers Fetched:", response.data.value.length);
+
+//     return response.data.value;
+
 //   } catch (error) {
 //     console.error(
 //       "Error fetching customers from NowCerts:",
@@ -121,18 +125,23 @@ async function createOpportunityInMomentum(opportunityData, token) {
 //   }
 // }
 
-// fetch customers based on date
+// Add Delta function Fecth Customers based on date
 
 async function fetchMomentumCustomers(token) {
   try {
-    console.log("Fetching Customers from NowCerts");
+    console.log("Fetching Customers from NowCerts (Last 1 Hour Delta)");
 
-    const url = 
+    // 🔹 Last 1 hour in UTC ISO format
+    const oneHourAgo = new Date(Date.now() - 5 *60 * 60 * 1000)
+      .toISOString()
+      .split(".")[0] + "Z"; // remove milliseconds
+
+    const url =
       "https://api.nowcerts.com/api/InsuredDetailList" +
       "?$count=true" +
       "&$orderby=ChangeDate desc" +
       "&$skip=0" +
-      "&$filter=ChangeDate ge 2025-12-03T12:00:00Z";  // EXACT same as curl
+      `&$filter=ChangeDate ge ${oneHourAgo}`;
 
     const response = await axios.get(url, {
       headers: {
@@ -190,7 +199,7 @@ async function getMomentumInsuredContacts(token, insuredIds) {
 
 // put company in momentum
 
-async function PutCompanyInMomentum(token, companyData) {
+async function PutCompanyInMomentum(companyData) {
   const url = "https://api.nowcerts.com/api/Company/Insert";
 
   const response = await fetch(url, {
@@ -637,47 +646,62 @@ async function getCompanyById(companyId,) {
 
 // fetch All contact with source group
 
-//  async function fetchContactsWithSourceGroup() {
-//     try {
-//         const response = await axios.post(
-//             `https://api.hubapi.com/crm/v3/objects/contacts/search`,
-//             {
-//                 filterGroups: [
-//                     {
-//                         filters: [
-//                             {
-//                                 propertyName: "source_group",
-//                                 operator: "HAS_PROPERTY"
-//                             }
-//                         ]
-//                     }
-//                 ],
-//                 properties: [
-//                     "firstname",
-//                     "lastname",
-//                     "email",
-//                     "source_group",
-//                     "sourceid",
-//                     "phone",
-//                     "address",
-//                     "city",
-//                     "state",
-//                     "zip"
-//                 ],
-//                 limit: 100
-//             },
-//             {
-//                 headers: {
-//                     Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-//                     "Content-Type": "application/json"
-//                 }
-//             }
-//         );
+// async function fetchContactsWithSourceGroup() {
+//     const allContacts = [];
+//     let after = null;
+//     const limit = 100;
 
-//         return response.data.results;
+//     try {
+//         do {
+//             const response = await axios.post(
+//                 "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//                 {
+//                     filterGroups: [
+//                         {
+//                             filters: [
+//                                 {
+//                                     propertyName: "source_group",
+//                                     operator: "HAS_PROPERTY"
+//                                 }
+//                             ]
+//                         }
+//                     ],
+//                     properties: [
+//                         "firstname",
+//                         "lastname",
+//                         "email",
+//                         "source_group",
+//                         "sourceid",
+//                         "phone",
+//                         "address",
+//                         "city",
+//                         "state",
+//                         "zip"
+//                     ],
+//                     limit,
+//                     ...(after && { after })
+//                 },
+//                 {
+//                     headers: {
+//                         Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//                         "Content-Type": "application/json"
+//                     }
+//                 }
+//             );
+
+//             const results = response.data.results || [];
+//             allContacts.push(...results);
+//             return allContacts; // todo remove after testing
+
+//             // Pagination cursor
+//             after = response.data.paging?.next?.after || null;
+
+//         } while (after);
+
+//         return allContacts;
 //     } catch (error) {
 //         console.error(
-//             "Error fetching HubSpot contacts:",
+//             "Error fetching HubSpot contacts with pagination:",
 //             error.response?.data || error.message
 //         );
 //         throw error;
@@ -688,6 +712,9 @@ async function fetchContactsWithSourceGroup() {
     const allContacts = [];
     let after = null;
     const limit = 100;
+
+    // 🔹 Last 1 hour timestamp (in ms)
+    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
 
     try {
         do {
@@ -700,6 +727,11 @@ async function fetchContactsWithSourceGroup() {
                                 {
                                     propertyName: "source_group",
                                     operator: "HAS_PROPERTY"
+                                },
+                                {
+                                    propertyName: "lastmodifieddate",
+                                    operator: "GTE",
+                                    value: oneHourAgo.toString()
                                 }
                             ]
                         }
@@ -714,7 +746,8 @@ async function fetchContactsWithSourceGroup() {
                         "address",
                         "city",
                         "state",
-                        "zip"
+                        "zip",
+                        "lastmodifieddate"
                     ],
                     limit,
                     ...(after && { after })
@@ -739,41 +772,15 @@ async function fetchContactsWithSourceGroup() {
         return allContacts;
     } catch (error) {
         console.error(
-            "Error fetching HubSpot contacts with pagination:",
+            "Error fetching HubSpot contacts with delta:",
             error.response?.data || error.message
         );
         throw error;
     }
 }
 
+
 // search function in contact based on database id
-
-
-// async function insertInsuredContact(data,accessToken) {
-
-  
-//   try {
-//     const response = await axios.post(
-//       "https://api.nowcerts.com/api/Insured/Insert",
-//       data,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`, // Replace with your actual token
-//           "Content-Type": "application/json",
-//           Cookie: "ARRAffinity=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc; ARRAffinitySameSite=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc",
-//         },
-//       }
-//     );
-
-//     return response?.data;
-//   } catch (error) {
-//     console.error(
-//       "Error inserting insured record:",
-//       error.response?.data || error.message
-//     );
-//     return{};
-//   }
-// }
 
 
 async function insertInsuredContact(data, accessToken) {

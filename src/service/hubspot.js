@@ -659,7 +659,7 @@ async function searchContactByEmail(email) {
 
   if (!email) {
     console.log ("No email provided");
-    return {};
+    return null;
   }
   try {
     const payload = {
@@ -714,6 +714,10 @@ async function searchContactByEmail(email) {
 
 // update contact in hubspot based in contactid
 async function updateHubspotContact(contactData, contactId) {
+  if (!contactId || !contactData) {
+    console.log("No contact ID provided");
+    return null;
+  }
   try {
     const payload = {
       properties: {
@@ -744,16 +748,18 @@ async function updateHubspotContact(contactData, contactId) {
     );
 
     console.log("✔ HubSpot contact updated successfully");
-    return response.data;
+    return response?.data;
 
   } catch (error) {
     console.error(
       "❌ HubSpot Update Contact Error:",
       error.response?.data || error.message
     );
-    return null;
+    throw error;
   }
 }
+
+
 
 
 // Synced Get All Contacts from Hubspot

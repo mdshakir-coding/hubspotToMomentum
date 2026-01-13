@@ -33,7 +33,6 @@ async function syncContactMomentum() {
     // call the function for all contacts by sourceGroup
     const contacts = await fetchContactsWithSourceGroup();
     logger.info(`final Contacts:${JSON.stringify(contacts.length) }`);
-    // logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
     // return;//todo remove after testing
 
     for (const contact of contacts) {
@@ -70,7 +69,7 @@ async function syncContactMomentum() {
       
         // search associated company
 
-        logger.info(`Contact ${JSON.stringify(contact, null,2 )}`);
+        // logger.info(`Contact ${JSON.stringify(contact, null,2 )}`);
 
         const associatedCompany = await getAssociatedCompanyByContactId(
           contact?.id
@@ -83,8 +82,8 @@ async function syncContactMomentum() {
         }
        
         
+        
         let company = null;
-
         if (associatedCompany.id) {
           company = await getCompanyById(associatedCompany.id);
           logger.info(`Company ${JSON.stringify(company, null,2 )}`);
@@ -94,13 +93,14 @@ async function syncContactMomentum() {
         logger.info(` Contact Payload ${JSON.stringify(contactPayload,null,2)}`);
 
 
-        let contactMomentum = null;
         // ✅ Create Contact in Momentum
+        let contactMomentum = null;
          contactMomentum = await createContactInMomentum(contactPayload,accessToken);
          logger.info(`Contact created in Momentum ${JSON.stringify(contactMomentum, null,2 )}`);
-        
-        // Update Function
-        const updatedContact = await updateContactById(contact.id, contactMomentum);
+
+         // ✅ Update Function in Momentum
+         let updatedContact= null;
+         updatedContact = await updateContactById(contact.id, contactMomentum);
         logger.info(`Contact updated successfully ${JSON.stringify(updatedContact, null,2 )}`);
 
 
@@ -111,7 +111,7 @@ async function syncContactMomentum() {
         logger.error(`Error syncing HubSpot to Momentum:`, error);
       }
     }
-    logger.info(" All contacts synced successfully.");
+    logger.info(" ☘️ All contacts synced successfully.");
   } catch (error) {
     logger.error(`Error syncing HubSpot to Momentum:`, error);
     return;
