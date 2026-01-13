@@ -1,6 +1,6 @@
 // import axios from "axios";
 
-import axios from "axios";
+import axios, { all } from "axios";
 import qs from "qs";
 import { logger } from "../index.js";
 
@@ -92,49 +92,17 @@ async function createOpportunityInMomentum(opportunityData, token) {
   }
 }
 
-// fetch customers based on date
-
-// async function fetchMomentumCustomers(token) {
-//   try {
-//     console.log("Fetching Customers from NowCerts");
-
-//     const url = 
-//       "https://api.nowcerts.com/api/InsuredDetailList" +
-//       "?$count=true" +
-//       "&$orderby=ChangeDate desc" +
-//       "&$skip=0" +
-//       "&$filter=ChangeDate ge 2025-12-03T12:00:00Z";  // EXACT same as curl
-
-//     const response = await axios.get(url, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         Accept: "application/json",
-//       },
-//     });
-
-//     console.log("NowCerts Customers Fetched:", response.data.value.length);
-
-//     return response.data.value;
-
-//   } catch (error) {
-//     console.error(
-//       "Error fetching customers from NowCerts:",
-//       error.response?.data || error.message
-//     );
-//     return [];
-//   }
-// }
 
 // Add Delta function Fecth Customers based on date
 
 async function fetchMomentumCustomers(token) {
   try {
-    console.log("Fetching Customers from NowCerts (Last 1 Hour Delta)");
+    console.log("Fetching momentum customers (Last 1 Hour Delta)");
 
     // 🔹 Last 1 hour in UTC ISO format
-    const oneHourAgo = new Date(Date.now() - 5 *60 * 60 * 1000)
+    const oneHourAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
       .toISOString()
-      .split(".")[0] + "Z"; // remove milliseconds
+      .split(".")[0] + "Z"; 
 
     const url =
       "https://api.nowcerts.com/api/InsuredDetailList" +
@@ -162,6 +130,64 @@ async function fetchMomentumCustomers(token) {
     return [];
   }
 }
+
+
+// Add Pagination Logic
+
+// async function fetchMomentumCustomers(token) {
+//   try {
+//     console.log("Fetching momentum customers (Last 1 Hour Delta)");
+
+//     const oneHourAgo = new Date(Date.now() - 1 * 60 * 60 * 1000)
+//       .toISOString()
+//       .split(".")[0] + "Z";
+
+//     const pageSize = 100; // Adjust as per API max limit if known
+//     let skip = 0;
+//     let allCustomers = [];
+//     let totalCount = null;
+
+//     while (true) {
+//       const url =
+//         "https://api.nowcerts.com/api/InsuredDetailList" +
+//         `?$count=true&$orderby=ChangeDate desc&$skip=${skip}` +
+//         `&$top=${pageSize}` 
+//         +`&$filter=ChangeDate ge ${oneHourAgo}`;
+
+//       const response = await axios.get(url, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           Accept: "application/json",
+//         },
+//       });
+
+//       const customers = response.data.value || [];
+//       totalCount = totalCount ?? response.data["@odata.count"]; // total count from first response
+//       allCustomers.push(...customers);
+//       // return allCustomers; //todo remove after Testing
+
+//       console.log(`Fetched ${customers.length} customers, total so far: ${allCustomers.length}`);
+
+//       // If fetched all, break
+//       if (allCustomers.length >= totalCount || customers.length < pageSize) {
+//         break;
+//       }
+
+//       skip += pageSize; // next page offset
+//     }
+
+//     console.log(`Total customers fetched: ${allCustomers.length}`);
+//     return allCustomers;
+
+//   } catch (error) {
+//     console.error(
+//       "Error fetching customers from NowCerts:",
+//       error.response?.data || error.message
+//     );
+//     return [];
+//   }
+// }
+
 
 
 
@@ -616,6 +642,10 @@ async function updateContactById(contactId, momentum) {
 // get company by id
 
 async function getCompanyById(companyId,) {
+  if (!companyId) {
+    console.log("Company ID is required");
+    return Null;
+  }
   try {
     if (!companyId) {
       console.log("Company ID is required");
@@ -640,16 +670,87 @@ async function getCompanyById(companyId,) {
       "❌ Error fetching company:",
       error?.response?.data || error.message
     );
-    return {};
+    return null;
   }
 }
 
+
 // fetch All contact with source group
+
+async function fetchContactsWithSourceGroup() {
+
+    console.log("Fetching contacts from HubSpot (Last 10 Minutes Delta)");
+
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+        .toISOString()
+        .split(".")[0] + "Z";
+
+    try {
+        const requestBody = {
+            filterGroups: [
+                {
+                    filters: [
+                        {
+                            propertyName: "source_group",
+                            operator: "HAS_PROPERTY"
+                        }
+                    ]
+                },
+                {
+                    filters: [
+                        {
+                            propertyName: "lastmodifieddate",
+                            operator: "GTE",
+                            value: oneHourAgo
+                        }
+                    ]
+                }
+            ],
+            properties: [
+                "firstname",
+                "lastname",
+                "email",
+                "source_group",
+                "sourceid",
+                "phone",
+                "address",
+                "city",
+                "state",
+                "zip",
+                "lastmodifieddate"
+            ]
+        };
+
+        const response = await axios.post(
+            "https://api.hubapi.com/crm/v3/objects/contacts/search",
+            requestBody,
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        return response.data.results || [];
+
+    } catch (error) {
+        console.error(
+            "Error fetching HubSpot contacts with delta:",
+            error.response?.data || error.message
+        );
+        return [];
+    }
+}
+
 
 // async function fetchContactsWithSourceGroup() {
 //     const allContacts = [];
 //     let after = null;
 //     const limit = 100;
+
+//     // 🔹 Last 1 hour timestamp (in ms)
+//     const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
 
 //     try {
 //         do {
@@ -662,6 +763,11 @@ async function getCompanyById(companyId,) {
 //                                 {
 //                                     propertyName: "source_group",
 //                                     operator: "HAS_PROPERTY"
+//                                 },
+//                                 {
+//                                     propertyName: "lastmodifieddate",
+//                                     operator: "GTE",
+//                                     value: oneHourAgo.toString()
 //                                 }
 //                             ]
 //                         }
@@ -676,7 +782,8 @@ async function getCompanyById(companyId,) {
 //                         "address",
 //                         "city",
 //                         "state",
-//                         "zip"
+//                         "zip",
+//                         "lastmodifieddate"
 //                     ],
 //                     limit,
 //                     ...(after && { after })
@@ -701,83 +808,101 @@ async function getCompanyById(companyId,) {
 //         return allContacts;
 //     } catch (error) {
 //         console.error(
-//             "Error fetching HubSpot contacts with pagination:",
+//             "Error fetching HubSpot contacts with delta:",
 //             error.response?.data || error.message
 //         );
 //         throw error;
 //     }
 // }
+//  Add Pagination Logic 
+// async function fetchContactsWithSourceGroup() {
+  
+//     const allContacts = [];
+//     let after = null;
+//     const limit = 100;
 
-async function fetchContactsWithSourceGroup() {
-    const allContacts = [];
-    let after = null;
-    const limit = 100;
+//     console.log("Fetching contacts from HubSpot (Last 1 Hour Delta)");
 
-    // 🔹 Last 1 hour timestamp (in ms)
-    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
+//     const oneHourAgo = new Date(Date.now() - 10 * 60 * 1000)
+//         .toISOString()
+//         .split(".")[0] + "Z";
+    
+//     try {
+//         do {
+//             const requestBody = {
+//                 filterGroups: [
+//                     {
+//                         filters: [
+//                             {
+//                                 propertyName: "source_group",
+//                                 operator: "HAS_PROPERTY"
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         filters: [
+//                             {
+//                                 propertyName: "lastmodifieddate",
+//                                 operator: "GTE",
+//                                 value: oneHourAgo
+//                             }
+//                         ]
+//                     }
+//                 ],
+//                 properties: [
+//                     "firstname",
+//                     "lastname",
+//                     "email",
+//                     "source_group",
+//                     "sourceid",
+//                     "phone",
+//                     "address",
+//                     "city",
+//                     "state",
+//                     "zip",
+//                     "lastmodifieddate"
+//                 ],
+//                 limit,
+//                 ...(after && { after })
+//             };
 
-    try {
-        do {
-            const response = await axios.post(
-                "https://api.hubapi.com/crm/v3/objects/contacts/search",
-                {
-                    filterGroups: [
-                        {
-                            filters: [
-                                {
-                                    propertyName: "source_group",
-                                    operator: "HAS_PROPERTY"
-                                },
-                                {
-                                    propertyName: "lastmodifieddate",
-                                    operator: "GTE",
-                                    value: oneHourAgo.toString()
-                                }
-                            ]
-                        }
-                    ],
-                    properties: [
-                        "firstname",
-                        "lastname",
-                        "email",
-                        "source_group",
-                        "sourceid",
-                        "phone",
-                        "address",
-                        "city",
-                        "state",
-                        "zip",
-                        "lastmodifieddate"
-                    ],
-                    limit,
-                    ...(after && { after })
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
+//             // console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-            const results = response.data.results || [];
-            allContacts.push(...results);
-            return allContacts; // todo remove after testing
+//             const response = await axios.post(
+//                 "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//                 requestBody,
+//                 {
+//                     headers: {
+//                         Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//                         "Content-Type": "application/json"
+//                     }
+//                 }
+//             );
 
-            // Pagination cursor
-            after = response.data.paging?.next?.after || null;
+//             const results = response.data.results || [];
+//             allContacts.push(...results);
+//             return allContacts; //todo remove after Testing
+//             after = response?.data?.paging?.next?.after || null;
 
-        } while (after);
+//             console.log(`Fetched ${results.length} contacts, total so far: ${allContacts.length}`);
 
-        return allContacts;
-    } catch (error) {
-        console.error(
-            "Error fetching HubSpot contacts with delta:",
-            error.response?.data || error.message
-        );
-        throw error;
-    }
-}
+//         } while (after);
+
+//         console.log(`Total contacts fetched: ${allContacts.length}`);
+
+//         return allContacts;
+
+//     } catch (error) {
+//         console.error(
+//             "Error fetching HubSpot contacts with delta:",
+//             error.response?.data || error.message
+//         );
+//         return allContacts;
+//     }
+// }
+
+
+
 
 
 // search function in contact based on database id

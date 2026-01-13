@@ -28,6 +28,7 @@ async function hubspotToMomentumsync() {
 
     const momentumCompanies = await fetchMomentumCustomers(token);
     console.log("Momentum companies:", momentumCompanies.length);
+    // return;
 
     for (const mc of momentumCompanies) {
       try {
@@ -90,7 +91,7 @@ async function hubspotToMomentumsync() {
             console.log("✔ Associate contact to company:", associated);
             console.log("✔ CONTACTID", conatctid);
             console.log("✔ companyId", companyId);
-            return; // todo remove after testing
+            // return; // todo remove after testing
 
             // throw new Error("stop associateCompanyToContact "); //
           } catch (error) {

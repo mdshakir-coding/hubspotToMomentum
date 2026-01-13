@@ -37,40 +37,11 @@ async function syncContactMomentum() {
 
     for (const contact of contacts) {
       try {
-        // search based Contacts id
-
-        // if (contact?.id !== "101100491877") {
-        //   // skip other contacts
-        //   continue;
-        // }
-        // logger.info("Processing Contact:", contact);
-        // return;
-
-        // if (contact.properties?.sync_to_momentum === "No" || contact.properties?.sync_to_momentum === null
-        //   || contact.properties?.sync_to_momentum === undefined ) {
-        //     logger.info ("Sync To momentum is no for Contact " , contact);
-        //     continue;
-        //   }
-
-        
-        // search based on sorceid if exist continue
-        // const existingContact = await searchContractBySourceId(
-        //   contact?.properties?.sourceid
-        // );
-
-        // if (existingContact) {
-        //   logger.info(
-        //     "Contact already exists in Momentum:",
-        //     existingContact.id
-        //   );
-        //   continue;
-        // }
-
       
-        // search associated company
-
+        
         // logger.info(`Contact ${JSON.stringify(contact, null,2 )}`);
-
+        
+        // search associated company
         const associatedCompany = await getAssociatedCompanyByContactId(
           contact?.id
         );
