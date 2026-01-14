@@ -97,10 +97,10 @@ async function createOpportunityInMomentum(opportunityData, token) {
 
 async function fetchMomentumCustomers(token) {
   try {
-    console.log("Fetching momentum customers (Last 1 Hour Delta)");
+    console.log("Fetching momentum customers (Delta)");
 
     // 🔹 Last 1 hour in UTC ISO format
-    const oneHourAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
+    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000)
       .toISOString()
       .split(".")[0] + "Z"; 
 
@@ -677,143 +677,6 @@ async function getCompanyById(companyId,) {
 
 // fetch All contact with source group
 
-async function fetchContactsWithSourceGroup() {
-
-    console.log("Fetching contacts from HubSpot (Last 10 Minutes Delta)");
-
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
-        .toISOString()
-        .split(".")[0] + "Z";
-
-    try {
-        const requestBody = {
-            filterGroups: [
-                {
-                    filters: [
-                        {
-                            propertyName: "source_group",
-                            operator: "HAS_PROPERTY"
-                        }
-                    ]
-                },
-                {
-                    filters: [
-                        {
-                            propertyName: "lastmodifieddate",
-                            operator: "GTE",
-                            value: oneHourAgo
-                        }
-                    ]
-                }
-            ],
-            properties: [
-                "firstname",
-                "lastname",
-                "email",
-                "source_group",
-                "sourceid",
-                "phone",
-                "address",
-                "city",
-                "state",
-                "zip",
-                "lastmodifieddate"
-            ]
-        };
-
-        const response = await axios.post(
-            "https://api.hubapi.com/crm/v3/objects/contacts/search",
-            requestBody,
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        return response.data.results || [];
-
-    } catch (error) {
-        console.error(
-            "Error fetching HubSpot contacts with delta:",
-            error.response?.data || error.message
-        );
-        return [];
-    }
-}
-
-
-// async function fetchContactsWithSourceGroup() {
-//     const allContacts = [];
-//     let after = null;
-//     const limit = 100;
-
-//     // 🔹 Last 1 hour timestamp (in ms)
-//     const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
-
-//     try {
-//         do {
-//             const response = await axios.post(
-//                 "https://api.hubapi.com/crm/v3/objects/contacts/search",
-//                 {
-//                     filterGroups: [
-//                         {
-//                             filters: [
-//                                 {
-//                                     propertyName: "source_group",
-//                                     operator: "HAS_PROPERTY"
-//                                 },
-//                                 {
-//                                     propertyName: "lastmodifieddate",
-//                                     operator: "GTE",
-//                                     value: oneHourAgo.toString()
-//                                 }
-//                             ]
-//                         }
-//                     ],
-//                     properties: [
-//                         "firstname",
-//                         "lastname",
-//                         "email",
-//                         "source_group",
-//                         "sourceid",
-//                         "phone",
-//                         "address",
-//                         "city",
-//                         "state",
-//                         "zip",
-//                         "lastmodifieddate"
-//                     ],
-//                     limit,
-//                     ...(after && { after })
-//                 },
-//                 {
-//                     headers: {
-//                         Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-//                         "Content-Type": "application/json"
-//                     }
-//                 }
-//             );
-
-//             const results = response.data.results || [];
-//             allContacts.push(...results);
-//             return allContacts; // todo remove after testing
-
-//             // Pagination cursor
-//             after = response.data.paging?.next?.after || null;
-
-//         } while (after);
-
-//         return allContacts;
-//     } catch (error) {
-//         console.error(
-//             "Error fetching HubSpot contacts with delta:",
-//             error.response?.data || error.message
-//         );
-//         throw error;
-//     }
-// }
 //  Add Pagination Logic 
 // async function fetchContactsWithSourceGroup() {
   
@@ -881,7 +744,7 @@ async function fetchContactsWithSourceGroup() {
 
 //             const results = response.data.results || [];
 //             allContacts.push(...results);
-//             return allContacts; //todo remove after Testing
+//             // return allContacts; //todo remove after Testing
 //             after = response?.data?.paging?.next?.after || null;
 
 //             console.log(`Fetched ${results.length} contacts, total so far: ${allContacts.length}`);
@@ -895,12 +758,72 @@ async function fetchContactsWithSourceGroup() {
 //     } catch (error) {
 //         console.error(
 //             "Error fetching HubSpot contacts with delta:",
-//             error.response?.data || error.message
+//             error.response?.data 
 //         );
 //         return allContacts;
 //     }
 // }
 
+async function fetchContactsWithSourceGroup() {
+    console.log("Fetching contacts from HubSpot (Delta)");
+
+    
+    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+
+    try {
+        const requestBody = {
+            filterGroups: [
+                {
+                    filters: [
+                        {
+                            propertyName: "source_group",
+                            operator: "HAS_PROPERTY"
+                        },
+                        {
+                            propertyName: "lastmodifieddate",
+                            operator: "GTE",
+                            value: oneHourAgo.toString()
+                        }
+                    ]
+                }
+            ],
+            properties: [
+                "firstname",
+                "lastname",
+                "email",
+                "source_group",
+                "sourceid",
+                "phone",
+                "address",
+                "city",
+                "state",
+                "zip",
+                "lastmodifieddate"
+            ],
+            limit: 100 // HubSpot max per request
+        };
+
+        const response = await axios.post(
+            "https://api.hubapi.com/crm/v3/objects/contacts/search",
+            requestBody,
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        return response.data.results || [];
+
+    } catch (error) {
+        console.error(
+            "Error fetching HubSpot contacts with delta:",
+            error.response?.data || error.message
+        );
+        return [];
+    }
+}
 
 
 

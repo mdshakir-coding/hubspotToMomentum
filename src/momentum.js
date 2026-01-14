@@ -20,14 +20,14 @@ app.listen(PORT, async function () {
   // getHubspotContacts();
   // getHubspotCompanies();
     //  createCompanyInMomentum();
-    // hubspotToMomentumsync();
+    hubspotToMomentumsync();
     // const contact = await getHubspotContacts();
     // console.log("final Contacts:", contact.length);
     // const token = await getAccessToken();
     //  const allcontacts = await fetchAllCustomerToMomentum(token);
     //  console.log("final Customers from Momentum:", allcontacts.length);
     // syncHubspotToMomentum();
-    syncContactMomentum();
+    // syncContactMomentum();
   
     
     

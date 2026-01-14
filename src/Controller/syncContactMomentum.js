@@ -49,13 +49,13 @@ async function syncContactMomentum() {
         logger.info(`Associated Company ${JSON.stringify(associatedCompany, null,2 )}`)
         if (!associatedCompany) {
           logger.info(`No associated company found for contact ID:${contact.id}`);
-          continue;
+          // continue;
         }
        
         
         
         let company = null;
-        if (associatedCompany.id) {
+        if (associatedCompany?.id) {
           company = await getCompanyById(associatedCompany.id);
           logger.info(`Company ${JSON.stringify(company, null,2 )}`);
         }
@@ -77,7 +77,7 @@ async function syncContactMomentum() {
 
 
 
-        return; // todo remove after testing
+        // return; // todo remove after testing
       } catch (error) {
         logger.error(`Error syncing HubSpot to Momentum:`, error);
       }

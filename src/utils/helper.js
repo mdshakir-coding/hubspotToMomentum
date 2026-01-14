@@ -15,8 +15,9 @@ function buildMomentumCompanyPayload(hubspotCompany) {
 // for Contact Payload
 
 function buildMomentumContactPayload(hubspotContact, hubspotCompany) {
-  const data = hubspotContact.properties || {};
-  const data2 = hubspotCompany.properties || {};
+ 
+  const data = hubspotContact?.properties || {};
+  const data2 = hubspotCompany?.properties || {};
 
   const payload = {
     CommercialName:data2?.name || null,
