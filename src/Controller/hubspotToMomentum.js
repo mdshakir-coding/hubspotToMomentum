@@ -91,9 +91,7 @@ async function hubspotToMomentumsync() {
             console.log("✔ Associate contact to company:", associated);
             console.log("✔ CONTACTID", conatctid);
             console.log("✔ companyId", companyId);
-            // return; // todo remove after testing
 
-            // throw new Error("stop associateCompanyToContact "); //
           } catch (error) {
             logger.error("❌ Error with contact:", error);
             // break; //todo remove after testing
@@ -101,8 +99,7 @@ async function hubspotToMomentumsync() {
         }
       } catch (err) {
         console.error("❌ Error with company:", err.message);
-        // break; // remember to remove this
-      }
+        }
     }
 
     
@@ -110,6 +107,7 @@ async function hubspotToMomentumsync() {
     console.log("\n=== SYNC COMPLETE ===");
   } catch (error) {
     console.error("❌ Fatal sync error:", error.message);
+    return;
   }
 }
 

@@ -99,8 +99,7 @@ async function fetchMomentumCustomers(token) {
   try {
     console.log("Fetching momentum customers (Delta)");
 
-    // 🔹 Last 1 hour in UTC ISO format
-    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000)
+    const oneHourAgo = new Date(Date.now() -   1 * 60 * 60 * 1000)
       .toISOString()
       .split(".")[0] + "Z"; 
 
@@ -608,7 +607,7 @@ async function updateContactById(contactId, momentum) {
     if (!contactId || !momentum) {
       // throw new Error("contactId and properties are required");
       console.log("contactId and properties are required");
-      return {};
+      return null;
     }
     const payload = {
       properties: {
@@ -635,26 +634,68 @@ async function updateContactById(contactId, momentum) {
       "❌ Error updating HubSpot contact:",
       error?.response?.data || error.message
     );
-    return {};
+    return null;
   }
 }
 
 // get company by id
 
-async function getCompanyById(companyId,) {
+// async function getCompanyById(companyId,) {
+//   if (!companyId) {
+//     console.log("Company ID is required");
+//     return Null;
+//   }
+//   try {
+//     if (!companyId) {
+//       console.log("Company ID is required");
+//       return {};
+//     }
+
+//     const response = await axios.get(
+//       `https://api.hubapi.com/crm/v3/objects/companies/${companyId}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//           "Content-Type": "application/json"
+//         }
+//       }
+//     );
+
+//     console.log("✅ Company fetched successfully:", response.data.id);
+//     return response.data;
+
+//   } catch (error) {
+//     console.error(
+//       "❌ Error fetching company:",
+//       error?.response?.data || error.message
+//     );
+//     return null;
+//   }
+// }
+
+// Add new company Properties 
+async function getCompanyById(companyId) {
   if (!companyId) {
     console.log("Company ID is required");
-    return Null;
+    return null;
   }
-  try {
-    if (!companyId) {
-      console.log("Company ID is required");
-      return {};
-    }
 
+  try {
     const response = await axios.get(
       `https://api.hubapi.com/crm/v3/objects/companies/${companyId}`,
       {
+        params: {
+          properties: [
+            "city",
+            "domain",
+            "name",
+            "phone",
+            "state",
+            "zip",
+            "buildertrend_id",
+            "source_toolbox"
+          ].join(",")
+        },
         headers: {
           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
           "Content-Type": "application/json"
@@ -764,66 +805,266 @@ async function getCompanyById(companyId,) {
 //     }
 // }
 
-async function fetchContactsWithSourceGroup() {
-    console.log("Fetching contacts from HubSpot (Delta)");
+// async function fetchContactsWithSourceGroup() {
+//     console.log("Fetching contacts from HubSpot (Delta)");
 
     
+//     const oneHourAgo = Date.now() - 1 * 60 * 60 * 1000;
+
+//     try {
+//         const requestBody = {
+//             filterGroups: [
+//                 {
+//                     filters: [
+//                         {
+//                             propertyName: "source_group",
+//                             operator: "HAS_PROPERTY"
+//                         },
+//                         {
+//                             propertyName: "lastmodifieddate",
+//                             operator: "GTE",
+//                             value: oneHourAgo.toString()
+//                         }
+//                     ]
+//                 }
+//             ],
+//             properties: [
+//                 "firstname",
+//                 "lastname",
+//                 "email",
+//                 "source_group",
+//                 "sourceid",
+//                 "phone",
+//                 "address",
+//                 "city",
+//                 "state",
+//                 "zip",
+//                 "lastmodifieddate"
+//             ],
+//             limit: 100 // HubSpot max per request
+//         };
+
+//         const response = await axios.post(
+//             "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//             requestBody,
+//             {
+//                 headers: {
+//                     Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//                     "Content-Type": "application/json"
+//                 }
+//             }
+//         );
+
+//         return response.data.results || [];
+
+//     } catch (error) {
+//         console.error(
+//             "Error fetching HubSpot contacts with delta:",
+//             error.response?.data || error.message
+//         );
+//         return [];
+//     }
+// }
+
+// Add New Conatact properties 
+
+// async function fetchContactsWithSourceGroup() {
+//     console.log("Fetching contacts from HubSpot (Delta)");
+
+//     // 1 hour ago (epoch milliseconds)
+//     const oneHourAgo = Date.now() - 60 * 60 * 1000;
+
+//     try {
+//         const requestBody = {
+//             filterGroups: [
+//                 {
+//                     filters: [
+//                         {
+//                             propertyName: "source_group",
+//                             operator: "HAS_PROPERTY"
+//                         },
+//                         // {
+//                         //     propertyName: "lastmodifieddate",
+//                         //     operator: "GTE",
+//                         //     value: oneHourAgo.toString()
+//                         // }
+//                     ]
+//                 }
+//             ],
+//             properties: [
+//                 "company",
+//                 "email",
+//                 "firstname",
+//                 "lastname",
+//                 "phone",
+//                 "audience_type",
+//                 "best_time_to_contact",
+//                 "coverage_type_interest",
+//                 "evari_quote_id",
+//                 "file_upload_toolbox",
+//                 "form_acknowledgment",
+//                 "lead_entry_point",
+//                 "mailing_address_city",
+//                 "mailing_address_different",
+//                 "mailing_address_postal_code",
+//                 "mailing_address_state",
+//                 "mailing_address_street",
+//                 "policy_duration",
+//                 "policy_start_date",
+//                 "preferred_contact_method",
+//                 "product",
+//                 "product_interest",
+//                 "product_tile_clicked",
+//                 "project_address",
+//                 "project_address_2",
+//                 "project_city",
+//                 "project_state",
+//                 "project_zip_code",
+//                 "project_description",
+//                 "project_location",
+//                 "request_category",
+//                 "routing_metadata_toolbox",
+//                 "state_of_operations",
+//                 "subproduct",
+//                 "tell_us_more_about_your_request",
+//                 "tf_url",
+//                 "source_group",
+//                 "what_best_describes_your_role_",
+//                 "lastmodifieddate"
+//             ],
+//             limit: 100
+//         };
+
+//         const response = await axios.post(
+//             "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//             requestBody,
+//             {
+//                 headers: {
+//                     Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//                     "Content-Type": "application/json"
+//                 }
+//             }
+//         );
+
+//         return response.data.results || [];
+
+//     } catch (error) {
+//         console.error(
+//             "Error fetching HubSpot contacts with source_group delta:",
+//             error.response?.data || error.message
+//         );
+//         return [];
+//     }
+// }
+
+// add delta Add New Conatact properties
+
+async function fetchContactsWithSourceGroup() {
+    console.log("Fetching contacts from HubSpot (Delta + Pagination)");
+
+    const allContacts = [];
+    let after = undefined;
+
+    // 🔹 Delta: last 1 hour (epoch milliseconds)
     const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
     try {
-        const requestBody = {
-            filterGroups: [
+        do {
+            const requestBody = {
+                filterGroups: [
+                    {
+                        filters: [
+                            {
+                                propertyName: "source_group",
+                                operator: "HAS_PROPERTY"
+                            },
+                            // {
+                            //     propertyName: "lastmodifieddate",
+                            //     operator: "GTE",
+                            //     value: oneHourAgo.toString()
+                            // }
+                        ]
+                    }
+                ],
+                properties: [
+                    "company",
+                    "email",
+                    "firstname",
+                    "lastname",
+                    "phone",
+                    "audience_type",
+                    "best_time_to_contact",
+                    "coverage_type_interest",
+                    "evari_quote_id",
+                    "file_upload_toolbox",
+                    "form_acknowledgment",
+                    "lead_entry_point",
+                    "mailing_address_city",
+                    "mailing_address_different",
+                    "mailing_address_postal_code",
+                    "mailing_address_state",
+                    "mailing_address_street",
+                    "policy_duration",
+                    "policy_start_date",
+                    "preferred_contact_method",
+                    "product",
+                    "product_interest",
+                    "product_tile_clicked",
+                    "project_address",
+                    "project_address_2",
+                    "project_city",
+                    "project_state",
+                    "project_zip_code",
+                    "project_description",
+                    "project_location",
+                    "request_category",
+                    "routing_metadata_toolbox",
+                    "state_of_operations",
+                    "subproduct",
+                    "tell_us_more_about_your_request",
+                    "tf_url",
+                    "source_group",
+                    "what_best_describes_your_role_",
+                    "lastmodifieddate"
+                ],
+                limit: 100,
+                ...(after && { after })
+            };
+
+            const response = await axios.post(
+                "https://api.hubapi.com/crm/v3/objects/contacts/search",
+                requestBody,
                 {
-                    filters: [
-                        {
-                            propertyName: "source_group",
-                            operator: "HAS_PROPERTY"
-                        },
-                        {
-                            propertyName: "lastmodifieddate",
-                            operator: "GTE",
-                            value: oneHourAgo.toString()
-                        }
-                    ]
+                    headers: {
+                        Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+                        "Content-Type": "application/json"
+                    }
                 }
-            ],
-            properties: [
-                "firstname",
-                "lastname",
-                "email",
-                "source_group",
-                "sourceid",
-                "phone",
-                "address",
-                "city",
-                "state",
-                "zip",
-                "lastmodifieddate"
-            ],
-            limit: 100 // HubSpot max per request
-        };
+            );
 
-        const response = await axios.post(
-            "https://api.hubapi.com/crm/v3/objects/contacts/search",
-            requestBody,
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+            const results = response.data.results || [];
+            allContacts.push(...results);
+            return allContacts; // todo remove after testing
 
-        return response.data.results || [];
+            after = response.data.paging?.next?.after;
+
+            console.log(
+                `Fetched ${results.length} contacts | Total: ${allContacts.length}`
+            );
+
+        } while (after);
+
+        return allContacts;
 
     } catch (error) {
         console.error(
-            "Error fetching HubSpot contacts with delta:",
+            "Error fetching HubSpot contacts (delta + pagination):",
             error.response?.data || error.message
         );
-        return [];
+        return allContacts;
     }
 }
+
 
 
 

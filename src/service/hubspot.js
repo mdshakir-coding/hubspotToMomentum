@@ -292,7 +292,7 @@ async function createHubspotCompany(company) {
         zip: company.zipCode,
         sourceid: company.id,   // change from datbasedid to id
         // email: company.eMail,    //new
-        // id: company.insuredId    //new     
+        // id: company.insuredId    //new
       }
     };
 
@@ -755,7 +755,7 @@ async function updateHubspotContact(contactData, contactId) {
       "❌ HubSpot Update Contact Error:",
       error.response?.data || error.message
     );
-    throw error;
+    return null;
   }
 }
 

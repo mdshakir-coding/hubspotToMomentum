@@ -49,7 +49,6 @@ async function syncContactMomentum() {
         logger.info(`Associated Company ${JSON.stringify(associatedCompany, null,2 )}`)
         if (!associatedCompany) {
           logger.info(`No associated company found for contact ID:${contact.id}`);
-          // continue;
         }
        
         
@@ -63,7 +62,7 @@ async function syncContactMomentum() {
         const contactPayload = buildMomentumContactPayload(contact, company);
         logger.info(` Contact Payload ${JSON.stringify(contactPayload,null,2)}`);
 
-
+        // return; //todo remove after testing
         // ✅ Create Contact in Momentum
         let contactMomentum = null;
          contactMomentum = await createContactInMomentum(contactPayload,accessToken);
