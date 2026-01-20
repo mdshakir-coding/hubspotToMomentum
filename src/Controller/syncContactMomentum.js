@@ -33,6 +33,7 @@ async function syncContactMomentum() {
     // call the function for all contacts by sourceGroup
     const contacts = await fetchContactsWithSourceGroup();
     logger.info(`final Contacts:${JSON.stringify(contacts.length) }`);
+    logger.info (`Contact ${JSON.stringify(contacts[0], null,2 )}`)
     // return;//todo remove after testing
 
     for (const contact of contacts) {
@@ -76,7 +77,7 @@ async function syncContactMomentum() {
 
 
 
-        // return; // todo remove after testing
+        return; // todo remove after testing
       } catch (error) {
         logger.error(`Error syncing HubSpot to Momentum:`, error);
       }

@@ -21,7 +21,7 @@ async function getAccessToken() {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      }
+      },
     );
 
     // console.log("Token:", response.data.access_token);
@@ -59,7 +59,7 @@ async function insertInsuredInMomentum(contact, token) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return response.data;
@@ -79,19 +79,18 @@ async function createOpportunityInMomentum(opportunityData, token) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return response.data;
   } catch (error) {
     console.error(
       "Error creating Opportunity in Momentum:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return null;
   }
 }
-
 
 // Add Delta function Fecth Customers based on date
 
@@ -99,9 +98,9 @@ async function fetchMomentumCustomers(token) {
   try {
     console.log("Fetching momentum customers (Delta)");
 
-    const oneHourAgo = new Date(Date.now() -   1 * 60 * 60 * 1000)
-      .toISOString()
-      .split(".")[0] + "Z"; 
+    const oneHourAgo =
+      new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString().split(".")[0] +
+      "Z";
 
     const url =
       "https://api.nowcerts.com/api/InsuredDetailList" +
@@ -120,16 +119,14 @@ async function fetchMomentumCustomers(token) {
     console.log("NowCerts Customers Fetched:", response.data.value.length);
 
     return response.data.value;
-
   } catch (error) {
     console.error(
       "Error fetching customers from NowCerts:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return [];
   }
 }
-
 
 // Add Pagination Logic
 
@@ -150,7 +147,7 @@ async function fetchMomentumCustomers(token) {
 //       const url =
 //         "https://api.nowcerts.com/api/InsuredDetailList" +
 //         `?$count=true&$orderby=ChangeDate desc&$skip=${skip}` +
-//         `&$top=${pageSize}` 
+//         `&$top=${pageSize}`
 //         +`&$filter=ChangeDate ge ${oneHourAgo}`;
 
 //       const response = await axios.get(url, {
@@ -187,13 +184,6 @@ async function fetchMomentumCustomers(token) {
 //   }
 // }
 
-
-
-
-
-
-
-
 //Get insured contacts
 
 async function getMomentumInsuredContacts(token, insuredIds) {
@@ -216,7 +206,7 @@ async function getMomentumInsuredContacts(token, insuredIds) {
   } catch (error) {
     console.error(
       "Error fetching insured contacts:",
-      error.response?.data || error
+      error.response?.data || error,
     );
     return null;
   }
@@ -241,7 +231,7 @@ async function PutCompanyInMomentum(companyData) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      `Error creating company: ${response.status} ${JSON.stringify(errorData)}`
+      `Error creating company: ${response.status} ${JSON.stringify(errorData)}`,
     );
   }
 
@@ -359,17 +349,16 @@ async function fetchAllCustomerToMomentum(token, maxId = 5000) {
     all.reduce((acc, c) => {
       acc[c.CustomerId] = c;
       return acc;
-    }, {})
+    }, {}),
   );
 
   console.log("TOTAL UNIQUE CUSTOMERS:", unique.length);
   return unique;
 }
 
-// Insert NowCerts Comapny 
+// Insert NowCerts Comapny
 
-
- async function insertNowCertsCompany(payload) {
+async function insertNowCertsCompany(payload) {
   try {
     const response = await axios.post(
       "https://api.nowcerts.com/api/Insured/Insert",
@@ -377,21 +366,20 @@ async function fetchAllCustomerToMomentum(token, maxId = 5000) {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`
-        }
-      }
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+        },
+      },
     );
 
     return response.data;
   } catch (error) {
     console.error(
       "Error inserting insured:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw error;
   }
 }
-
 
 // Insert Nowcerts Contacts
 
@@ -403,16 +391,16 @@ async function insertNowCertsContacts(payload) {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`
-        }
-      }
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+        },
+      },
     );
 
     return response.data;
   } catch (error) {
     console.error(
       "NowCerts Insured Insert Error:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw error;
   }
@@ -420,7 +408,7 @@ async function insertNowCertsContacts(payload) {
 
 // search company in momentum from delta
 
- async function getCompaniesModifiedLast1Hour() {
+async function getCompaniesModifiedLast1Hour() {
   try {
     // ⏱️ Calculate 1 hour ago (ISO format)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -443,8 +431,8 @@ async function insertNowCertsContacts(payload) {
                 {
                   propertyName: "sync_to_momentum",
                   operator: "EQ",
-                  value: "Yes"
-                }
+                  value: "Yes",
+                },
               ],
             },
           ],
@@ -463,32 +451,30 @@ async function insertNowCertsContacts(payload) {
             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       companies.push(...response.data.results);
       return companies; // todo after remove testing
-      
-      after = response.data.paging?.next?.after;
 
+      after = response.data.paging?.next?.after;
     } while (after);
 
     return companies;
-
   } catch (error) {
     console.error(
       "❌ Error fetching HubSpot companies (last 1 hour):",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return [];
   }
 }
 
 // search contacts in momentum from delta
- async function getContactsModifiedLast1Hour() {
+async function getContactsModifiedLast1Hour() {
   try {
     // ⏱️ 1 hour ago (UTC, ISO)
-    const oneHourAgo = new Date(Date.now() -  60 * 60 * 1000).toISOString();
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
     let contacts = [];
     let after;
@@ -504,7 +490,7 @@ async function insertNowCertsContacts(payload) {
                   propertyName: "sync_to_momentum",
                   operator: "EQ",
                   value: "Yes",
-                }
+                },
                 // {
                 //   propertyName: "lastmodifieddate",
                 //   operator: "GTE",
@@ -524,7 +510,7 @@ async function insertNowCertsContacts(payload) {
             "address",
             "city",
             "state",
-            "zip"
+            "zip",
           ],
           limit: 100,
           after,
@@ -534,21 +520,19 @@ async function insertNowCertsContacts(payload) {
             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       contacts.push(...response.data.results);
       return contacts; //todo remove after Testing
       after = response.data.paging?.next?.after;
-
     } while (after);
 
     return contacts;
-
   } catch (error) {
     console.error(
       "❌ Error fetching HubSpot contacts (last 1 hour):",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return [];
   }
@@ -574,10 +558,7 @@ async function searchContractBySourceId(sourceId) {
           ],
         },
       ],
-      properties: [
-        "sourceid",
-        
-      ],
+      properties: ["sourceid"],
       limit: 10,
       after: 0,
     };
@@ -593,7 +574,7 @@ async function searchContractBySourceId(sourceId) {
   } catch (error) {
     console.error(
       "Error searching deal by sourceid:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return null;
   }
@@ -602,7 +583,6 @@ async function searchContractBySourceId(sourceId) {
 // Update function in contacts
 
 async function updateContactById(contactId, momentum) {
- 
   try {
     if (!contactId || !momentum) {
       // throw new Error("contactId and properties are required");
@@ -612,8 +592,8 @@ async function updateContactById(contactId, momentum) {
     const payload = {
       properties: {
         sourceid: momentum?.insuredDatabaseId,
-      }
-    }
+      },
+    };
 
     const response = await axios.patch(
       `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,
@@ -621,18 +601,17 @@ async function updateContactById(contactId, momentum) {
       {
         headers: {
           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-          "Content-Type": "application/json"
-        }
-      }
+          "Content-Type": "application/json",
+        },
+      },
     );
 
     // console.log("✅ Contact updated successfully:", response.data.id);
     return response.data;
-
   } catch (error) {
     console.error(
       "❌ Error updating HubSpot contact:",
-      error?.response?.data || error.message
+      error?.response?.data || error.message,
     );
     return null;
   }
@@ -673,7 +652,7 @@ async function updateContactById(contactId, momentum) {
 //   }
 // }
 
-// Add new company Properties 
+// Add new company Properties
 async function getCompanyById(companyId) {
   if (!companyId) {
     console.log("Company ID is required");
@@ -693,34 +672,32 @@ async function getCompanyById(companyId) {
             "state",
             "zip",
             "buildertrend_id",
-            "source_toolbox"
-          ].join(",")
+            "source_toolbox",
+          ].join(","),
         },
         headers: {
           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-          "Content-Type": "application/json"
-        }
-      }
+          "Content-Type": "application/json",
+        },
+      },
     );
 
     console.log("✅ Company fetched successfully:", response.data.id);
     return response.data;
-
   } catch (error) {
     console.error(
       "❌ Error fetching company:",
-      error?.response?.data || error.message
+      error?.response?.data || error.message,
     );
     return null;
   }
 }
 
-
 // fetch All contact with source group
 
-//  Add Pagination Logic 
+//  Add Pagination Logic
 // async function fetchContactsWithSourceGroup() {
-  
+
 //     const allContacts = [];
 //     let after = null;
 //     const limit = 100;
@@ -730,7 +707,7 @@ async function getCompanyById(companyId) {
 //     const oneHourAgo = new Date(Date.now() - 10 * 60 * 1000)
 //         .toISOString()
 //         .split(".")[0] + "Z";
-    
+
 //     try {
 //         do {
 //             const requestBody = {
@@ -799,7 +776,7 @@ async function getCompanyById(companyId) {
 //     } catch (error) {
 //         console.error(
 //             "Error fetching HubSpot contacts with delta:",
-//             error.response?.data 
+//             error.response?.data
 //         );
 //         return allContacts;
 //     }
@@ -808,7 +785,6 @@ async function getCompanyById(companyId) {
 // async function fetchContactsWithSourceGroup() {
 //     console.log("Fetching contacts from HubSpot (Delta)");
 
-    
 //     const oneHourAgo = Date.now() - 1 * 60 * 60 * 1000;
 
 //     try {
@@ -866,7 +842,7 @@ async function getCompanyById(companyId) {
 //     }
 // }
 
-// Add New Conatact properties 
+// Add New Conatact properties
 
 // async function fetchContactsWithSourceGroup() {
 //     console.log("Fetching contacts from HubSpot (Delta)");
@@ -960,117 +936,112 @@ async function getCompanyById(companyId) {
 // add delta Add New Conatact properties
 
 async function fetchContactsWithSourceGroup() {
-    console.log("Fetching contacts from HubSpot (Delta + Pagination)");
+  console.log("Fetching contacts from HubSpot (Delta + Pagination)");
 
-    const allContacts = [];
-    let after = undefined;
+  const allContacts = [];
+  let after = undefined;
 
-    // 🔹 Delta: last 1 hour (epoch milliseconds)
-    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+  // 🔹 Delta: last 1 hour (epoch milliseconds)
+  const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
-    try {
-        do {
-            const requestBody = {
-                filterGroups: [
-                    {
-                        filters: [
-                            {
-                                propertyName: "source_group",
-                                operator: "HAS_PROPERTY"
-                            },
-                            // {
-                            //     propertyName: "lastmodifieddate",
-                            //     operator: "GTE",
-                            //     value: oneHourAgo.toString()
-                            // }
-                        ]
-                    }
-                ],
-                properties: [
-                    "company",
-                    "email",
-                    "firstname",
-                    "lastname",
-                    "phone",
-                    "audience_type",
-                    "best_time_to_contact",
-                    "coverage_type_interest",
-                    "evari_quote_id",
-                    "file_upload_toolbox",
-                    "form_acknowledgment",
-                    "lead_entry_point",
-                    "mailing_address_city",
-                    "mailing_address_different",
-                    "mailing_address_postal_code",
-                    "mailing_address_state",
-                    "mailing_address_street",
-                    "policy_duration",
-                    "policy_start_date",
-                    "preferred_contact_method",
-                    "product",
-                    "product_interest",
-                    "product_tile_clicked",
-                    "project_address",
-                    "project_address_2",
-                    "project_city",
-                    "project_state",
-                    "project_zip_code",
-                    "project_description",
-                    "project_location",
-                    "request_category",
-                    "routing_metadata_toolbox",
-                    "state_of_operations",
-                    "subproduct",
-                    "tell_us_more_about_your_request",
-                    "tf_url",
-                    "source_group",
-                    "what_best_describes_your_role_",
-                    "lastmodifieddate"
-                ],
-                limit: 100,
-                ...(after && { after })
-            };
+  try {
+    do {
+      const requestBody = {
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "source_group",
+                operator: "HAS_PROPERTY",
+              },
+              // {
+              //     propertyName: "lastmodifieddate",
+              //     operator: "GTE",
+              //     value: oneHourAgo.toString()
+              // }
+            ],
+          },
+        ],
+        properties: [
+          "company",
+          "email",
+          "firstname",
+          "lastname",
+          "phone",
+          "audience_type",
+          "best_time_to_contact",
+          "coverage_type_interest",
+          "evari_quote_id",
+          "file_upload_toolbox",
+          "form_acknowledgment",
+          "lead_entry_point",
+          "mailing_address_city",
+          "mailing_address_different",
+          "mailing_address_postal_code",
+          "mailing_address_state",
+          "mailing_address_street",
+          "policy_duration",
+          "policy_start_date",
+          "preferred_contact_method",
+          "product",
+          "product_interest",
+          "product_tile_clicked",
+          "project_address",
+          "project_address_2",
+          "project_city",
+          "project_state",
+          "project_zip_code",
+          "project_description",
+          "project_location",
+          "request_category",
+          "routing_metadata_toolbox",
+          "state_of_operations",
+          "subproduct",
+          "tell_us_more_about_your_request",
+          "tf_url",
+          "source_group",
+          "what_best_describes_your_role_",
+          "lastmodifieddate",
+          "lifecyclestage",
+          "hs_lead_status",
+        ],
+        limit: 100,
+        ...(after && { after }),
+      };
 
-            const response = await axios.post(
-                "https://api.hubapi.com/crm/v3/objects/contacts/search",
-                requestBody,
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
+      const response = await axios.post(
+        "https://api.hubapi.com/crm/v3/objects/contacts/search",
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
-            const results = response.data.results || [];
-            allContacts.push(...results);
-            return allContacts; // todo remove after testing
+      const results = response.data.results || [];
+      allContacts.push(...results);
+      return allContacts; // todo remove after testing
 
-            after = response.data.paging?.next?.after;
+      after = response.data.paging?.next?.after;
 
-            console.log(
-                `Fetched ${results.length} contacts | Total: ${allContacts.length}`
-            );
+      console.log(
+        `Fetched ${results.length} contacts | Total: ${allContacts.length}`,
+      );
+    } while (after);
 
-        } while (after);
-
-        return allContacts;
-
-    } catch (error) {
-        console.error(
-            "Error fetching HubSpot contacts (delta + pagination):",
-            error.response?.data || error.message
-        );
-        return allContacts;
-    }
+    return allContacts;
+  } catch (error) {
+    console.error(
+      "Error fetching HubSpot contacts (delta + pagination):",
+      error.response?.data || error.message,
+    );
+    return allContacts;
+  }
 }
 
-
-
-
-
 // search function in contact based on database id
-
 
 async function insertInsuredContact(data, accessToken) {
   try {
@@ -1084,23 +1055,18 @@ async function insertInsuredContact(data, accessToken) {
           Cookie:
             "ARRAffinity=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc; ARRAffinitySameSite=34e9092522d828ce3f68b0fc2d734f9da443874f86beba281a0c943e057a71cc",
         },
-      }
+      },
     );
 
     return response?.data;
   } catch (error) {
     console.error(
       "Error inserting insured record:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
-   throw error;
+    throw error;
   }
 }
-
-
-
-
-
 
 export {
   getAccessToken,
@@ -1119,6 +1085,4 @@ export {
   getCompanyById,
   fetchContactsWithSourceGroup,
   insertInsuredContact,
-  
-
 };

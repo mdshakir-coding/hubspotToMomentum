@@ -2,6 +2,7 @@
 // import "dotenv/config";
 
 import { app } from "./app.js"; 
+import {cleanProps} from "./utils/helper.js"
 
 
 import{logger}from "./utils/logger.js"
@@ -37,6 +38,8 @@ import{getCompanyById}from "./service/momentum.service.js"
 export { 
   app,
   logger,
+  cleanProps,
+
   createHubspotCompany,
   fetchMomentumCustomers,
   getHubspotContacts,
