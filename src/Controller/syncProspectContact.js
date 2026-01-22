@@ -12,7 +12,7 @@ import { insertInsuredContact } from "../service/momentum.service.js";
 import { searchLifestageContacts } from "../service/momentum.service.js";
 import { SearchProspectsMomentum } from "../service/momentum.service.js";
 import { insertProspectInMomentum } from "../service/momentum.service.js";
-import{buildProspectsPayload} from "../utils/helper.js"
+import { buildProspectsPayload } from "../utils/helper.js";
 
 async function syncProspectContact() {
   try {
@@ -27,13 +27,13 @@ async function syncProspectContact() {
     // return; //todo remove after testing
 
     for (const contact of lifestageContacts) {
-
       try {
         const lifecycleStage = contact.properties?.lifecyclestage;
 
         // Skip if no lifecycle stage
         if (!lifecycleStage) continue;
         // Only process required stages
+        // Normalize value (safety)
         if (
           lifecycleStage === "MQL" ||
           lifecycleStage === "SQL" ||
@@ -43,19 +43,34 @@ async function syncProspectContact() {
             `Processing contact ${JSON.stringify(contact, null, 2)} | Stage: ${lifecycleStage}`,
           );
 
-          // Build payload 
+          // Build payload
           const payload = buildProspectsPayload(contact);
-          logger.info(
-            `Prospect Payload:${JSON.stringify(payload, null, 2)}`,
-          );
+          logger.info(`Prospect Payload:${JSON.stringify(payload, null, 2)}`);
 
           // Update and Create Prospect
           const prospect = await insertProspectInMomentum(payload, accessToken);
           logger.info(
             ` prospect in Momentum ${JSON.stringify(prospect, null, 2)}`,
           );
+        }
 
-          break; // todo remove after testing
+        // for customer
+        if (lifecycleStage === "customer") {
+          logger.info(
+            `Processing contact ${JSON.stringify(contact, null, 2)} | Stage: ${lifecycleStage}`,
+          );
+
+          // build payload for customer
+
+          const payload = buildMomentumContactPayload(contact);
+          logger.info(` Insured Payload:${JSON.stringify(payload, null, 2)}`);
+
+          // Create and Update Customer
+          const prospect = await insertProspectInMomentum(payload, accessToken);
+          logger.info(
+            ` Insured in Momentum ${JSON.stringify(prospect, null, 2)}`,
+          );
+          return;
         }
       } catch (error) {
         console.error(`Error syncing Contact ID ${contact}:`, error);
