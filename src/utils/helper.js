@@ -49,12 +49,6 @@ function cleanProps(obj) {
   return cleaned;
 }
 
-
-
-
-
-
-
 function buildMomentumCompanyPayload(hubspotCompany) {
   const data = hubspotCompany.properties || {};
 
@@ -73,61 +67,61 @@ const audienceTypeMap = {
   "Current Policyholder": "CURRENT_POLICYHOLDER",
   "Looking for a Quote": "LOOKING_FOR_A_QUOTE",
   "Builder/Lender/Developer": "BUILDER_LENDER_DEVELOPER",
-  "Homeowner": "HOMEOWNER",
-  "Information Only": "INFORMATION_ONLY"
+  Homeowner: "HOMEOWNER",
+  "Information Only": "INFORMATION_ONLY",
 };
 
 const projectStateMap = {
-  "alabama": "ALABAMA",
-  "alaska": "ALASKA",
-  "arizona": "ARIZONA",
-  "arkansas": "ARKANSAS",
-  "california": "CALIFORNIA",
-  "colorado": "COLORADO",
-  "connecticut": "CONNECTICUT",
-  "delaware": "DELAWARE",
-  "florida": "FLORIDA",
-  "georgia": "GEORGIA",
-  "hawaii": "HAWAII",
-  "idaho": "IDAHO",
-  "illinois": "ILLINOIS",
-  "indiana": "INDIANA",
-  "iowa": "IOWA",
-  "kansas": "KANSAS",
-  "kentucky": "KENTUCKY",
-  "louisiana": "LOUISIANA",
-  "maine": "MAINE",
-  "maryland": "MARYLAND",
-  "massachusetts": "MASSACHUSETTS",
-  "michigan": "MICHIGAN",
-  "minnesota": "MINNESOTA",
-  "mississippi": "MISSISSIPPI",
-  "missouri": "MISSOURI",
-  "montana": "MONTANA",
-  "nebraska": "NEBRASKA",
-  "nevada": "NEVADA",
-  "newhampshire": "NEW_HAMPSHIRE",
-  "newjersey": "NEW_JERSEY",
-  "newmexico": "NEW_MEXICO",
-  "newyork": "NEW_YORK",
-  "northcarolina": "NORTH_CAROLINA",
-  "northdakota": "NORTH_DAKOTA",
-  "ohio": "OHIO",
-  "oklahoma": "OKLAHOMA",
-  "oregon": "OREGON",
-  "pennsylvania": "PENNSYLVANIA",
-  "rhodeisland": "RHODE_ISLAND",
-  "southcarolina": "SOUTH_CAROLINA",
-  "southdakota": "SOUTH_DAKOTA",
-  "tennessee": "TENNESSEE",
-  "texas": "TEXAS",
-  "utah": "UTAH",
-  "vermont": "VERMONT",
-  "virginia": "VIRGINIA",
-  "washington": "WASHINGTON",
-  "westvirginia": "WEST_VIRGINIA",
-  "wisconsin": "WISCONSIN",
-  "wyoming": "WYOMING"
+  alabama: "ALABAMA",
+  alaska: "ALASKA",
+  arizona: "ARIZONA",
+  arkansas: "ARKANSAS",
+  california: "CALIFORNIA",
+  colorado: "COLORADO",
+  connecticut: "CONNECTICUT",
+  delaware: "DELAWARE",
+  florida: "FLORIDA",
+  georgia: "GEORGIA",
+  hawaii: "HAWAII",
+  idaho: "IDAHO",
+  illinois: "ILLINOIS",
+  indiana: "INDIANA",
+  iowa: "IOWA",
+  kansas: "KANSAS",
+  kentucky: "KENTUCKY",
+  louisiana: "LOUISIANA",
+  maine: "MAINE",
+  maryland: "MARYLAND",
+  massachusetts: "MASSACHUSETTS",
+  michigan: "MICHIGAN",
+  minnesota: "MINNESOTA",
+  mississippi: "MISSISSIPPI",
+  missouri: "MISSOURI",
+  montana: "MONTANA",
+  nebraska: "NEBRASKA",
+  nevada: "NEVADA",
+  newhampshire: "NEW_HAMPSHIRE",
+  newjersey: "NEW_JERSEY",
+  newmexico: "NEW_MEXICO",
+  newyork: "NEW_YORK",
+  northcarolina: "NORTH_CAROLINA",
+  northdakota: "NORTH_DAKOTA",
+  ohio: "OHIO",
+  oklahoma: "OKLAHOMA",
+  oregon: "OREGON",
+  pennsylvania: "PENNSYLVANIA",
+  rhodeisland: "RHODE_ISLAND",
+  southcarolina: "SOUTH_CAROLINA",
+  southdakota: "SOUTH_DAKOTA",
+  tennessee: "TENNESSEE",
+  texas: "TEXAS",
+  utah: "UTAH",
+  vermont: "VERMONT",
+  virginia: "VIRGINIA",
+  washington: "WASHINGTON",
+  westvirginia: "WEST_VIRGINIA",
+  wisconsin: "WISCONSIN",
+  wyoming: "WYOMING",
 };
 
 function normalizeProjectState(state) {
@@ -137,9 +131,6 @@ function normalizeProjectState(state) {
   return projectStateMap[cleaned] || null;
 }
 
-
-
-
 // for Contact Payload
 
 function buildMomentumContactPayload(hubspotContact, hubspotCompany) {
@@ -147,8 +138,7 @@ function buildMomentumContactPayload(hubspotContact, hubspotCompany) {
   const data2 = hubspotCompany?.properties || {};
 
   const payload = cleanProps({
-  
-    // Type: audienceTypeMap[data?.audience_type] || null, 
+    // Type: audienceTypeMap[data?.audience_type] || null,
 
     State: normalizeProjectState[data?.project_state] || null,
     CommercialName: data?.company || null,
@@ -176,12 +166,31 @@ function buildMomentumContactPayload(hubspotContact, hubspotCompany) {
 
     CustomerId: data2?.buildertrend_id || null,
     LeadSources: data2?.source_toolbox || null,
-    EMail2: data2?.email || null
-
+    EMail2: data2?.email || null,
   });
 
   return payload;
 }
 
+function buildProspectsPayload(contact) {
+  const payload = cleanProps({
+    firstname: contact.properties?.firstname,
+    lastname: contact.properties?.lastname,
+    email: contact.properties?.email,
+    phone: contact.properties?.phone,
+    address: contact.properties?.address,
+    city: contact.properties?.city,
+    state: contact.properties?.state,
+    zip: contact.properties?.zip,
+    insured_type: "Commercial",
+  });
 
-export { buildMomentumCompanyPayload, buildMomentumContactPayload, cleanProps };
+  return payload;
+}
+
+export {
+  buildMomentumCompanyPayload,
+  buildMomentumContactPayload,
+  cleanProps,
+  buildProspectsPayload,
+};

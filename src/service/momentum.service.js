@@ -1068,6 +1068,130 @@ async function insertInsuredContact(data, accessToken) {
   }
 }
 
+
+// Search lifestage contacts
+
+async function searchLifestageContacts() {
+  console.log("Fetching contacts with lifecyclestage");
+
+  const allContacts = [];
+  let after = undefined;
+
+  try {
+    do {
+      const requestBody = {
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "lifecyclestage",
+                operator: "HAS_PROPERTY",
+              },
+            ],
+          },
+        ],
+        properties: [
+          "email",
+          "firstname",
+          "lastname",
+          "lifecyclestage",
+          "lastmodifieddate",
+        ],
+        limit: 100,
+        ...(after && { after }),
+      };
+
+      const response = await axios.post(
+        "https://api.hubapi.com/crm/v3/objects/contacts/search",
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const results = response.data.results || [];
+      allContacts.push(...results);
+      return allContacts; // todo remove after Testing
+
+      after = response.data.paging?.next?.after;
+
+      console.log(
+        `Fetched ${results.length} contacts | Total: ${allContacts.length}`
+      );
+    } while (after);
+
+    return allContacts;
+  } catch (error) {
+    console.error(
+      "Error fetching lifecyclestage contacts:",
+      error.response?.data || error.message
+    );
+    return allContacts;
+  }
+}
+
+// search Prospects in momentum
+
+
+async function SearchProspectsMomentum(databaseId,accessToken) {
+  try {
+    const response = await axios.get(
+      "https://api.nowcerts.com/api/Customers/GetCustomers",
+      {
+        params: {
+          databaseId,
+        },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching NOWCERTS customers:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+}
+
+// Update and Create Prospectfunction in Momentum
+async function insertProspectInMomentum(payload, accessToken) {
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Insured/Insert",
+      payload,
+      
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error inserting insured:",
+      error.response?.data || error.message
+    );
+  return null; 
+ }
+}
+
+
+
+
+
+
+
+
 export {
   getAccessToken,
   insertInsuredInMomentum,
@@ -1085,4 +1209,7 @@ export {
   getCompanyById,
   fetchContactsWithSourceGroup,
   insertInsuredContact,
+  searchLifestageContacts,
+  SearchProspectsMomentum,
+  insertProspectInMomentum
 };

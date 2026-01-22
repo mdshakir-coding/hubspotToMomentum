@@ -5,6 +5,7 @@ import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMom
   hubspotToMomentumsync,fetchAllCustomerToMomentum} from "./index.js";
   import { syncHubspotToMomentum } from "./Controller/sycHubspotToMomentum.js";
   import { syncContactMomentum } from "./Controller/syncContactMomentum.js";
+  import { syncProspectContact } from "./Controller/syncProspectContact.js";
   
 import { getAccessToken } from "./service/momentum.service.js";
 
@@ -27,7 +28,8 @@ app.listen(PORT, async function () {
     //  const allcontacts = await fetchAllCustomerToMomentum(token);
     //  console.log("final Customers from Momentum:", allcontacts.length);
     // syncHubspotToMomentum();
-    syncContactMomentum();
+    // syncContactMomentum();
+    syncProspectContact();
   
     
     
