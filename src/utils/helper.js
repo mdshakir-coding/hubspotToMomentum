@@ -133,87 +133,62 @@ function normalizeProjectState(state) {
 
 // for Contact Payload
 
-function buildMomentumContactPayload(hubspotContact, hubspotCompany = {}) {
-  const data = hubspotContact?.properties || {};
-  const data2 = hubspotCompany?.properties || {};
+function buildMomentumContactPayload(contact, company = {}) 
+ {
+  // const data = hubspotContact?.properties || {};
+  // const data2 = hubspotCompany?.properties || {};
 
   const payload = cleanProps({
 
-    insured_type: "Commercial",
-    FirstName: data?.firstname || null,
-    LastName: data?.lastname || null,
-    Email: data?.email || null,
-    Phone: data?.phone || null,
-    AddressLine1: data?.address || null,
-    city: data?.city || null,
-    State: data?.state || null,
-    Zip: data?.zip || null,
 
-    
-    
-    
-    
-    // CommercialName: data?.company || null,
+    insured_type: "Commercial",
+      type: 0,
+
     // FirstName: data?.firstname || null,
     // LastName: data?.lastname || null,
-    // EMail: data?.email || null,
-    // Phone: data?.phone || null,
-    // AddressLine1: data?.project_address || null,
-    // AddressLine2: data?.project_address_2 || null,
-    // City: data?.project_city || data?.mailing_address_city || null,
-    // State: normalizeProjectState[data?.project_state] || null,
-    // Description: data?.project_description || null,
-    // Website: data?.tf_url || null,
+    commercialName: company?.properties?.name || null,
+    Email: contact?.properties?.email || null,
+    Phone: contact?.properties?.phone || null,
+    AddressLine1: contact?.properties?.address || null,
+    city: contact?.properties?.city || null,
+    State: contact?.properties?.state || null,
+    Zip: contact?.properties?.zip || null,
 
-    // // ---- Company fallback fields ----
-    // FirstName: data2?.name || null,
-    // AddressLine1: data2?.address || null,
-    // City: data2?.city || null,
-    // State: data2?.state || null,
-    // ZipCode: data2?.zip || null,
-    // Phone: data2?.phone || null,
+   // new 
+    //   insured_type: "Commercial",
+    // type: 0,
 
-    // CustomerId: data2?.buildertrend_id || null,
-    // LeadSources: data2?.source_toolbox || null,
-    // EMail2: data2?.email || null,
+    // commercialName: data2?.properties?.name || null,
+    // addressLine1: data?.properties?.address || null,
+    // city: data?.properties?.city || null,
+    // zipCode: data?.properties?.project_zip_code || null,
+    // eMail: data?.properties?.email || null,
+    // phone: data?.properties?.phone || null,
+    // cellPhone: data?.properties?.phone_number_1 || null,
+    // smsPhone: data?.properties?.second_phone || null,
+    // description: data?.properties?.project_description || null,
+    // website: data?.properties?.website || null,
+    // fax: data?.properties?.fax || null,
   });
 
   return payload;
 }
-// Exaple payload of prospect
-//  "databaseId": "66d26eb0-ca30-499a-8466-9f1b364d97b0",
-//         "commercialName": "Test",
-//         "firstName": null,
-//         "lastName": null,
-//         "type": 0,
-//         "addressLine1": "Test",
-//         "addressLine2": "Test",
-//         "stateNameOrAbbreviation": "Alaska",
-//         "city": "Test",
-//         "zipCode": "Test",
-//         "eMail": "test@gmail.com",
-//         "eMail2": "test@gmail.com",
-//         "eMail3": "test@gmail.com",
-//         "fax": "113333333",
-//         "phone": "277              22",
-//         "cellPhone": "22  22  22",
-//         "smsPhone": "11 11 11",
-//         "description": "Test",
-//         "active": true,
-//         "website": "test@gmail.com",
-//         "fein": "Test",
-//         "customerId": "Test",
-//         "insuredId": "123456"
 
-function buildProspectsPayload(contact,company) {
+
+function buildProspectsPayload(contact, company) {
   const payload = cleanProps({
-  //  commercialName: company?.properties?.name || null,
+    // toInsert: {
+    //   type: "Prospect",
+    //  commercialName: "Metzger Insurance Agency",
     insured_type: "Commercial",
-    type: "0",
-    type: "true",
+    type: 0,
+    // active: true,
+    // type: "Prospect",
+    // type: "true",
 
-    firstName: contact?.properties?.firstname || null,
-    lastName: contact?.properties?.lastname || null,
+    // firstName: contact?.properties?.firstname || null,
+    // lastName: contact?.properties?.lastname || null,
+    commercialName: company?.properties?.name || null,
     addressLine1: contact?.properties?.address || null,
     city: contact?.properties?.city || null,
     zipCode: contact?.properties?.project_zip_code || null,
@@ -232,6 +207,26 @@ function buildProspectsPayload(contact,company) {
     // customerId: contact?.properties?.customerId || null,
     // insuredId: contact?.properties?.insuredId || null
 
+    // }
+  });
+
+  return payload;
+}
+
+// insert principal payload
+function buildPrincipalPayload(contact, insuredDatabaseId) {
+  const payload = cleanProps({
+
+
+    insured_database_id: insuredDatabaseId,
+    first_name: contact?.properties?.firstname || null,
+    last_name: contact?.properties?.lastname || null,
+      personal_email: contact?.properties?.email || null,
+      business_email: contact?.properties?.email || null,
+      insured_email: contact?.properties?.email || null,
+
+    // match_record_base_on_name: true,
+    // is_primary: true,
 
 
 
@@ -245,4 +240,5 @@ export {
   buildMomentumContactPayload,
   cleanProps,
   buildProspectsPayload,
+  buildPrincipalPayload,
 };

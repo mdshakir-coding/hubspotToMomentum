@@ -1049,6 +1049,60 @@ async function getAssociatedCompanyByContactId(contactId) {
   }
 }
 
+// Seach Deal in Husbpot
+
+
+async function getAllHubSpotDeals() {
+  const limit = 100;
+  let after = null;
+  let hasMore = true;
+
+  let allDeals = [];
+
+  try {
+    while (hasMore) {
+      const response = await axios.post(
+        'https://api.hubapi.com/crm/v3/objects/deals/search',
+        {
+          limit,
+          after
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const deals = response.data.results || [];
+
+      console.log(
+        `Fetched batch → ${deals.length} deals`
+      );
+
+      // Add to master array
+      allDeals.push(...deals);
+      // return allDeals; // todo remove after testing
+
+      // Pagination check
+      if (response.data.paging?.next?.after) {
+        after = response.data.paging.next.after;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return allDeals;
+
+  } catch (error) {
+    console.error(
+      'Error fetching HubSpot deals:',
+      error.response ? error.response.data : error.message
+    );
+    return [];
+  }
+}
 
 
 
@@ -1056,4 +1110,4 @@ export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createH
 , getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,
 getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies,
 searchCompanyByName,createCompanyInHubSpot,updateCompanyInHubSpot,createContactInMomentum,
-getAssociatedCompanyByContactId};
+getAssociatedCompanyByContactId,getAllHubSpotDeals};

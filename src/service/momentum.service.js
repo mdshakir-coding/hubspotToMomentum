@@ -673,6 +673,10 @@ async function getCompanyById(companyId) {
             "zip",
             "buildertrend_id",
             "source_toolbox",
+            "firstname",
+            "address",
+            "lastname",
+            "email",
           ].join(","),
         },
         headers: {
@@ -1068,24 +1072,99 @@ async function insertInsuredContact(data, accessToken) {
   }
 }
 
-
 // Search lifestage contacts
+
+// async function searchLifestageContacts() {
+//   console.log("Fetching contacts with lifecyclestage");
+
+//   const allContacts = [];
+//   let after = undefined;
+
+//   try {
+//     do {
+//       const requestBody = {
+//         filterGroups: [
+//           {
+//             filters: [
+//               {
+//                 propertyName: "lifecyclestage",
+//                 operator: "HAS_PROPERTY",
+//               },
+//             ],
+//           },
+//         ],
+//         properties: [
+//           "firstname",
+//           "lastname",
+//           "lifecyclestage",
+//           "email",
+//           "phone",
+//           "phone_number_1",
+//           "second_phone",
+//           "address",
+//           "city",
+//           "project_zip_code",
+//           "email",
+//           "fax",
+//           "project_description",
+//           "website",
+
+//         ],
+//         limit: 100,
+//         ...(after && { after }),
+//       };
+
+//       const response = await axios.post(
+//         "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//         requestBody,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
+
+//       const results = response.data.results || [];
+//       allContacts.push(...results);
+//       return allContacts; // todo remove after Testing
+
+//       after = response.data.paging?.next?.after;
+
+//       console.log(
+//         `Fetched ${results.length} contacts | Total: ${allContacts.length}`
+//       );
+//     } while (after);
+
+//     return allContacts;
+//   } catch (error) {
+//     console.error(
+//       "Error fetching lifecyclestage contacts:",
+//       error.response?.data || error.message
+//     );
+//     return allContacts;
+//   }
+// }
 
 async function searchLifestageContacts() {
   console.log("Fetching contacts with lifecyclestage");
 
+  const limit = 100;
+  let after = null;
+  let hasMore = true;
+
   const allContacts = [];
-  let after = undefined;
 
   try {
-    do {
+    while (hasMore) {
       const requestBody = {
         filterGroups: [
           {
             filters: [
               {
-                propertyName: "lifecyclestage",
-                operator: "HAS_PROPERTY",
+                propertyName: "hs_object_id",
+                operator: "EQ",
+                value: "196244532240",
               },
             ],
           },
@@ -1101,14 +1180,13 @@ async function searchLifestageContacts() {
           "address",
           "city",
           "project_zip_code",
-          "email",
           "fax",
           "project_description",
           "website",
-          
+          "commercialName",
         ],
-        limit: 100,
-        ...(after && { after }),
+        limit,
+        after,
       };
 
       const response = await axios.post(
@@ -1119,25 +1197,30 @@ async function searchLifestageContacts() {
             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
-      const results = response.data.results || [];
+      const results = response?.data?.results || [];
       allContacts.push(...results);
       return allContacts; // todo remove after Testing
 
-      after = response.data.paging?.next?.after;
-
       console.log(
-        `Fetched ${results.length} contacts | Total: ${allContacts.length}`
+        `Fetched batch → ${results.length} contacts | Total: ${allContacts.length}`,
       );
-    } while (after);
+
+      // Pagination handling
+      if (response.data.paging?.next?.after) {
+        after = response.data.paging.next.after;
+      } else {
+        hasMore = false;
+      }
+    }
 
     return allContacts;
   } catch (error) {
     console.error(
       "Error fetching lifecyclestage contacts:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return allContacts;
   }
@@ -1145,8 +1228,7 @@ async function searchLifestageContacts() {
 
 // search Prospects in momentum
 
-
-async function SearchProspectsMomentum(databaseId,accessToken) {
+async function SearchProspectsMomentum(databaseId, accessToken) {
   try {
     const response = await axios.get(
       "https://api.nowcerts.com/api/Customers/GetCustomers",
@@ -1158,14 +1240,14 @@ async function SearchProspectsMomentum(databaseId,accessToken) {
           Accept: "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
 
     return response.data;
   } catch (error) {
     console.error(
       "Error fetching NOWCERTS customers:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     return null;
   }
@@ -1177,28 +1259,56 @@ async function insertProspectInMomentum(payload, accessToken) {
     const response = await axios.post(
       "https://api.nowcerts.com/api/Insured/Insert",
       payload,
-      
+
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
     return response.data;
   } catch (error) {
     console.error(
       "Error inserting insured:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
-  return null; 
- }
+    return null;
+  }
 }
 
 
+// Insert Principal function in Momentum
+async function insertPrincipal(payload,accessToken) {
+  try {
+    //  payload = {
+    //    insured_database_id: "5c7f7405-d19d-406a-b190-9e8792807e53",
+    //   first_name: "John",
+    //   last_name: "Doe",
+    //   match_record_base_on_name: true,
+    //   is_primary: true
+    // };
 
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Zapier/InsertPrincipal",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
 
-
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error inserting principal:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+}
 
 
 
@@ -1221,5 +1331,6 @@ export {
   insertInsuredContact,
   searchLifestageContacts,
   SearchProspectsMomentum,
-  insertProspectInMomentum
+  insertProspectInMomentum,
+  insertPrincipal,
 };
