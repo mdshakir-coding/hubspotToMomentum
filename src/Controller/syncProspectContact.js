@@ -146,9 +146,7 @@ async function syncProspectContact() {
           );
 
           // Insrert Principal
-          const principalResponse = await insertPrincipal(
-            principalPayload,
-            accessToken,
+          const principalResponse = await insertPrincipal( principalPayload, accessToken,
           );
           logger.info(
             `Principal in Momentum ${JSON.stringify(principalResponse, null, 2)}`,

@@ -1281,13 +1281,6 @@ async function insertProspectInMomentum(payload, accessToken) {
 // Insert Principal function in Momentum
 async function insertPrincipal(payload,accessToken) {
   try {
-    //  payload = {
-    //    insured_database_id: "5c7f7405-d19d-406a-b190-9e8792807e53",
-    //   first_name: "John",
-    //   last_name: "Doe",
-    //   match_record_base_on_name: true,
-    //   is_primary: true
-    // };
 
     const response = await axios.post(
       "https://api.nowcerts.com/api/Zapier/InsertPrincipal",
@@ -1305,6 +1298,109 @@ async function insertPrincipal(payload,accessToken) {
     console.error(
       "Error inserting principal:",
       error.response?.data || error.message
+    );
+    return null;
+  }
+}
+
+// get conatact by id
+async function getContactById(contactId) {
+  if (!contactId) {
+    console.log("Contact ID is required");
+    return null;
+  }
+
+  try {
+    const response = await axios.get(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,
+      {
+        params: {
+          properties: [
+            "firstname",
+            "lastname",
+            "email",
+            "phone",
+            "mobilephone",
+            "city",
+            "state",
+            "zip",
+            "address",
+            "company",
+            "jobtitle",
+            "lifecyclestage",
+            "source_toolbox",
+            "buildertrend_id",
+          ].join(","),
+        },
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("✅ Contact fetched successfully:", response.data.id);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error fetching contact:",
+      error?.response?.data || error.message
+    );
+    return null;
+  }
+}
+//
+
+async function SearchdatabaseIdInMomentum(email, accessToken) {
+  try {
+    const response = await axios.get(
+      "https://api.nowcerts.com/api/Customers/GetCustomers",
+      {
+        params: {
+          email,
+        },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    return response.data [0] || null;
+  } catch (error) {
+    console.error(
+      "Error fetching NOWCERTS customers:",
+      error.response?.data || error.message,
+    );
+    return null;
+  }
+}
+
+// insert Quote in Momentum
+
+async function insertQuoteInMomentum({ payload, accessToken }) {
+  if (!payload) {
+   return null;
+  }
+
+  try {
+    const response = await axios.post(
+      "https://api.nowcerts.com/api/Zapier/InsertQuote",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    console.log("✅ Quote inserted successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error inserting quote:",
+      error?.response?.data || error.message
     );
     return null;
   }
@@ -1333,4 +1429,7 @@ export {
   SearchProspectsMomentum,
   insertProspectInMomentum,
   insertPrincipal,
+  getContactById,
+  SearchdatabaseIdInMomentum,
+  insertQuoteInMomentum,
 };

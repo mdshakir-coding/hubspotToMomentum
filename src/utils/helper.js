@@ -217,6 +217,7 @@ function buildProspectsPayload(contact, company) {
 function buildPrincipalPayload(contact, insuredDatabaseId) {
   const payload = cleanProps({
 
+    
 
     insured_database_id: insuredDatabaseId,
     first_name: contact?.properties?.firstname || null,
@@ -235,10 +236,36 @@ function buildPrincipalPayload(contact, insuredDatabaseId) {
   return payload;
 }
 
+function buildQuotePayload(contact, deal, databaseId) {
+  const payload = cleanProps({
+
+     insured_type: "Commercial",
+    type: 0,
+
+    // number: contact?.properties?.number || null,
+    number: "QT-100245",
+
+    insured_database_id:databaseId || null,
+    // first_name: contact?.properties?.firstname || null,
+    // last_name: contact?.properties?.lastname || null,
+    dealname: deal?.properties?.dealname || null,
+    email: contact?.properties?.email || null,
+    description: deal?.properties?.description || null,
+    billing_type: deal?.properties?.dealtype || null,
+
+
+
+    });
+
+  return payload;
+}
+
+
 export {
   buildMomentumCompanyPayload,
   buildMomentumContactPayload,
   cleanProps,
   buildProspectsPayload,
   buildPrincipalPayload,
+  buildQuotePayload,
 };

@@ -30,8 +30,8 @@ app.listen(PORT, async function () {
     //  console.log("final Customers from Momentum:", allcontacts.length);
     // syncHubspotToMomentum();
     // syncContactMomentum();
-    syncProspectContact();
-    // syncDealsQuoteMomentum();
+    // syncProspectContact();
+    syncDealsQuoteMomentum();
   
     
     

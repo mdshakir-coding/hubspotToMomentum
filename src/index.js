@@ -8,7 +8,7 @@ import {cleanProps} from "./utils/helper.js"
 import{logger}from "./utils/logger.js"
 
 import { getHubspotContacts, getHubspotCompanies, createHubspotCompany, createCompanyInMomentum, 
-    associateCompanyToContact, searchCompanyBySourceId, getAssociatedCompanies,updateHubspotContact,getAllHubSpotDeals} from "./service/hubspot.js";
+    associateCompanyToContact, searchCompanyBySourceId, getAssociatedCompanies,updateHubspotContact,getAllHubSpotDeals,getAssociatedContactsByDealId} from "./service/hubspot.js";
 
 import { 
   getAccessToken,
@@ -26,6 +26,9 @@ import {
   SearchProspectsMomentum,
   insertProspectInMomentum,
   insertPrincipal,
+  getContactById,
+  SearchdatabaseIdInMomentum,
+  insertQuoteInMomentum,
 } from "./service/momentum.service.js";
 
 import { hubspotToMomentumsync } from "./Controller/hubspotToMomentum.js";
@@ -77,6 +80,10 @@ export {
   insertProspectInMomentum,
   getAllHubSpotDeals,
   insertPrincipal,
+  getAssociatedContactsByDealId,
+  getContactById,
+  SearchdatabaseIdInMomentum,
+  insertQuoteInMomentum,
 
 
 };

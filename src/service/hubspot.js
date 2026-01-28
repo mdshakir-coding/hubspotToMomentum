@@ -1052,53 +1052,117 @@ async function getAssociatedCompanyByContactId(contactId) {
 // Seach Deal in Husbpot
 
 
+// async function getAllHubSpotDeals() {
+//   const limit = 100;
+//   let after = null;
+//   let hasMore = true;
+
+//   let allDeals = [];
+
+//   try {
+//     while (hasMore) {
+//       const response = await axios.post(
+//         'https://api.hubapi.com/crm/v3/objects/deals/search',
+//         {
+//           limit,
+//           after
+//         },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//             'Content-Type': 'application/json'
+//           }
+//         }
+//       );
+
+//       const deals = response.data.results || [];
+
+//       console.log(
+//         `Fetched batch → ${deals.length} deals`
+//       );
+
+//       // Add to master array
+//       allDeals.push(...deals);
+//       // return allDeals; // todo remove after testing
+
+//       // Pagination check
+//       if (response.data.paging?.next?.after) {
+//         after = response.data.paging.next.after;
+//       } else {
+//         hasMore = false;
+//       }
+//     }
+
+//     return allDeals;
+
+//   } catch (error) {
+//     console.error(
+//       'Error fetching HubSpot deals:',
+//       error.response ? error.response.data : error.message
+//     );
+//     return [];
+//   }
+// }
+// search deal by object id
 async function getAllHubSpotDeals() {
-  const limit = 100;
-  let after = null;
-  let hasMore = true;
-
-  let allDeals = [];
-
   try {
-    while (hasMore) {
-      const response = await axios.post(
-        'https://api.hubapi.com/crm/v3/objects/deals/search',
-        {
-          limit,
-          after
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
-            'Content-Type': 'application/json'
+    const response = await axios.post(
+      'https://api.hubapi.com/crm/v3/objects/deals/search',
+      {
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "hs_object_id",
+                operator: "EQ",
+                value: "54744580986"
+              }
+            ]
           }
+        ],
+        limit: 1
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
         }
-      );
-
-      const deals = response.data.results || [];
-
-      console.log(
-        `Fetched batch → ${deals.length} deals`
-      );
-
-      // Add to master array
-      allDeals.push(...deals);
-      // return allDeals; // todo remove after testing
-
-      // Pagination check
-      if (response.data.paging?.next?.after) {
-        after = response.data.paging.next.after;
-      } else {
-        hasMore = false;
       }
-    }
+    );
 
-    return allDeals;
-
+    return response.data.results;
   } catch (error) {
     console.error(
-      'Error fetching HubSpot deals:',
-      error.response ? error.response.data : error.message
+      'Error searching deal by object id:',
+      error.response?.data || error.message
+    );
+    return [];
+  }
+}
+
+
+// get associated contacts by deal id
+
+async function getAssociatedContactsByDealId(dealId) {
+  if (!dealId) return [];
+
+  try {
+    const response = await axios.get(
+      `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/contacts`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    // returns [{ id, type }]
+    return response.data?.results [0] || [];
+  } catch (error) {
+    console.error(
+      "❌ Error fetching associated contacts:",
+      error?.response?.data || error.message
     );
     return [];
   }
@@ -1106,8 +1170,9 @@ async function getAllHubSpotDeals() {
 
 
 
+
 export { getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,createHubspotCompany,associateCompanyToContact
 , getAssociatedCompanies,searchCompanyBySourceId,createHubspotContact,searchContactBySourceId,
 getAllHubspotCompanies,searchContactByEmail,updateHubspotContact,getAllContacts,getAllCompanies,
 searchCompanyByName,createCompanyInHubSpot,updateCompanyInHubSpot,createContactInMomentum,
-getAssociatedCompanyByContactId,getAllHubSpotDeals};
+getAssociatedCompanyByContactId,getAllHubSpotDeals,getAssociatedContactsByDealId};
