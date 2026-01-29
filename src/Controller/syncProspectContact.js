@@ -25,11 +25,11 @@ async function syncProspectContact() {
     logger.info(
       `Lifestage Contacts:${JSON.stringify(lifestageContacts.length)}`,
     );
-    logger.info(
-      `Lifestage Contacts:${JSON.stringify(lifestageContacts[0], null, 2)}`,
-    );
+    // logger.info(
+    //   `Lifestage Contacts:${JSON.stringify(lifestageContacts[0], null, 2)}`,
+    // );
 
-    // return; //todo remove after testing
+    return; //todo remove after testing
 
     for (const contact of lifestageContacts) {
       try {

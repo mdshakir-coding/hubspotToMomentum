@@ -1075,6 +1075,7 @@ async function insertInsuredContact(data, accessToken) {
 // Search lifestage contacts
 
 // async function searchLifestageContacts() {
+  
 //   console.log("Fetching contacts with lifecyclestage");
 
 //   const allContacts = [];
@@ -1110,7 +1111,7 @@ async function insertInsuredContact(data, accessToken) {
 //           "website",
 
 //         ],
-//         limit: 100,
+//         limit: 200,
 //         ...(after && { after }),
 //       };
 
@@ -1125,15 +1126,16 @@ async function insertInsuredContact(data, accessToken) {
 //         }
 //       );
 
-//       const results = response.data.results || [];
+//       const results = response?.data?.results || [];
 //       allContacts.push(...results);
-//       return allContacts; // todo remove after Testing
+//       // return allContacts; // todo remove after Testing
 
-//       after = response.data.paging?.next?.after;
+//       after = response?.data?.paging?.next?.after;
 
 //       console.log(
 //         `Fetched ${results.length} contacts | Total: ${allContacts.length}`
 //       );
+      
 //     } while (after);
 
 //     return allContacts;
@@ -1149,7 +1151,7 @@ async function insertInsuredContact(data, accessToken) {
 async function searchLifestageContacts() {
   console.log("Fetching contacts with lifecyclestage");
 
-  const limit = 100;
+  const limit = 200;
   let after = null;
   let hasMore = true;
 
@@ -1220,7 +1222,7 @@ async function searchLifestageContacts() {
   } catch (error) {
     console.error(
       "Error fetching lifecyclestage contacts:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
     return allContacts;
   }
