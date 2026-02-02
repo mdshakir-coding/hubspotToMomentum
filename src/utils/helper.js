@@ -125,55 +125,105 @@ const projectStateMap = {
 };
 
 function normalizeProjectState(state) {
-  if (!state || typeof state !== "string") return null;
-  // Lowercase and remove spaces
-  const cleaned = state.toLowerCase().replace(/\s+/g, "");
-  return projectStateMap[cleaned] || null;
+  if (!state) return null;
+
+  const map = {
+    Alabama: "AL",
+    Alaska: "AK",
+    California: "CA",
+    Texas: "TX",
+    AL: "AL",
+    AK: "AK",
+    CA: "CA",
+    TX: "TX",
+  };
+
+  const s = state.toString().trim();
+  return map[s] || null;
 }
+
+// function normalizeProjectState(state) {
+//   if (!state || typeof state !== "string") return null;
+//   // Lowercase and remove spaces
+//   const cleaned = state.toLowerCase().replace(/\s+/g, "");
+//   return projectStateMap[cleaned] || null;
+// }
 
 // for Contact Payload
 
-function buildMomentumContactPayload(contact, company = {}) 
- {
-  // const data = hubspotContact?.properties || {};
-  // const data2 = hubspotCompany?.properties || {};
+function buildMomentumContactPayload(contact, company = {}) {
 
   const payload = cleanProps({
-
-
     insured_type: "Commercial",
-      type: 0,
+    type: 0,
 
-    // FirstName: data?.firstname || null,
-    // LastName: data?.lastname || null,
+   
     commercialName: company?.properties?.name || null,
     Email: contact?.properties?.email || null,
     Phone: contact?.properties?.phone || null,
-    AddressLine1: contact?.properties?.address || null,
-    city: contact?.properties?.city || null,
-    State: contact?.properties?.state || null,
-    Zip: contact?.properties?.zip || null,
 
-   // new 
-    //   insured_type: "Commercial",
-    // type: 0,
+    // company details
+    addressLine1: company?.properties?.address || "Test Address 1",
+    addressLine2: company?.properties?.address2 || "Test Address 2",
+    zipCode: company?.properties?.zip || "12345",
+    city: company?.properties?.city || "Test City",
+    phone: company?.properties?.phone || "123-456-7890",
+    cellPhone: company?.properties?.phone_number_1 || "555-555-5555",
+    smsPhone: company?.properties?.second_phone || "098-765-4321",
+    description: company?.properties?.description || "Test description",
+    website: company?.properties?.website || "https://example.com",
+    fax: company?.properties?.fax || "111-222-3333",
+    State : "Alaska",
 
-    // commercialName: data2?.properties?.name || null,
-    // addressLine1: data?.properties?.address || null,
-    // city: data?.properties?.city || null,
-    // zipCode: data?.properties?.project_zip_code || null,
-    // eMail: data?.properties?.email || null,
-    // phone: data?.properties?.phone || null,
-    // cellPhone: data?.properties?.phone_number_1 || null,
-    // smsPhone: data?.properties?.second_phone || null,
-    // description: data?.properties?.project_description || null,
-    // website: data?.properties?.website || null,
-    // fax: data?.properties?.fax || null,
+  
   });
 
   return payload;
 }
 
+// function buildMomentumContactPayload(contact, company = {}) {
+
+//   // ✅ STEP 1: state calculate FIRST
+//   const rawState = company?.properties?.state;
+//   const normalizedState = normalizeProjectState(rawState);
+
+//   const stateCode =
+//     normalizedState && normalizedState.length === 2
+//       ? normalizedState
+//       : "AL"; // fallback MUST be code
+
+//   console.log("Raw state:", rawState);
+//   console.log("Normalized state:", normalizedState);
+//   console.log("Final state sent:", stateCode);
+
+//   // ✅ STEP 2: payload build
+//   const payload = cleanProps({
+//     insured_type: "Commercial",
+//     type: 0,
+
+//     commercialName: company?.properties?.name || null,
+//     Email: contact?.properties?.email || null,
+//     Phone: contact?.properties?.phone || null,
+
+//     addressLine1: company?.properties?.address || "Test Address 1",
+//     addressLine2: company?.properties?.address2 || "Test Address 2",
+//     zipCode: company?.properties?.zip || "12345",
+//     city: company?.properties?.city || "Test City",
+
+//     phone: company?.properties?.phone || "123-456-7890",
+//     cellPhone: company?.properties?.phone_number_1 || "555-555-5555",
+//     smsPhone: company?.properties?.second_phone || "098-765-4321",
+
+//     description: company?.properties?.description || "Test description",
+//     website: company?.properties?.website || "https://example.com",
+//     fax: company?.properties?.fax || "111-222-3333",
+
+//     // ✅ THIS WAS MISSING
+//     stateNameOrAbbreviation: stateCode,
+//   });
+
+//   return payload;
+// }
 
 function buildProspectsPayload(contact, company) {
   const payload = cleanProps({
@@ -216,21 +266,25 @@ function buildProspectsPayload(contact, company) {
 // insert principal payload
 function buildPrincipalPayload(contact, insuredDatabaseId) {
   const payload = cleanProps({
-
-    
-
     insured_database_id: insuredDatabaseId,
     first_name: contact?.properties?.firstname || null,
     last_name: contact?.properties?.lastname || null,
-      personal_email: contact?.properties?.email || null,
-      business_email: contact?.properties?.email || null,
-      insured_email: contact?.properties?.email || null,
+    personal_email: contact?.properties?.email || null,
+    business_email: contact?.properties?.email || null,
+    insured_email: contact?.properties?.email || null,
+    
+
+
+    // address_line_1: contact?.properties?.address || null,
+    // address_line_2: contact?.properties?.address|| null,
+    // insured_city: contact?.properties?.city || null,
+    // insured_state: contact?.properties?.state || null,
+    // zip_code: contact?.properties?.zip || null,
+    // insured_phone: contact?.properties?.phone || null,
+    // description: contact?.properties?.description || null,
 
     // match_record_base_on_name: true,
     // is_primary: true,
-
-
-
   });
 
   return payload;
@@ -238,28 +292,30 @@ function buildPrincipalPayload(contact, insuredDatabaseId) {
 
 function buildQuotePayload(contact, deal, databaseId) {
   const payload = cleanProps({
-
-     insured_type: "Commercial",
+    insured_type: "Commercial",
     type: 0,
 
     // number: contact?.properties?.number || null,
     number: "QT-100245",
 
-    insured_database_id:databaseId || null,
-    // first_name: contact?.properties?.firstname || null,
-    // last_name: contact?.properties?.lastname || null,
-    dealname: deal?.properties?.dealname || null,
-    email: contact?.properties?.email || null,
-    description: deal?.properties?.description || null,
-    billing_type: deal?.properties?.dealtype || null,
-
-
-
-    });
+    insured_database_id: databaseId || null,
+    insured_first_name: contact?.properties?.firstname || null,
+    insured_last_name: contact?.properties?.lastname || null,
+    // dealname: deal?.properties?.dealname || null,
+    insured_email: contact?.properties?.email || null,
+    description: deal?.properties?.description || "Test",
+    // billing_type: deal?.properties?.dealtype || "New Business",
+    insured_address_line_1: deal?.properties?.address || "Test1",
+    // insured_address_line_2: deal?.properties?.address2 || "Test2",
+    // insured_city: deal?.properties?.city || "Test City",
+    // insured_state: deal?.properties?.state || "CA",
+    // insured_zip_code: deal?.properties?.zip || "90001",
+    // addressLine1: "test data 1",
+    // addressLine2: "test data 2",
+  });
 
   return payload;
 }
-
 
 export {
   buildMomentumCompanyPayload,

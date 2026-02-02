@@ -1141,6 +1141,67 @@ async function getAllHubSpotDeals() {
 }
 
 
+// async function getAllHubSpotDeals() {
+//   try {
+//     const response = await axios.post(
+//       'https://api.hubapi.com/crm/v3/objects/deals/search',
+//       {
+//         filterGroups: [
+//           {
+//             filters: [
+//               {
+//                 propertyName: "hs_object_id",
+//                 operator: "EQ",
+//                 value: "54744580986"
+//               }
+//             ]
+//           }
+//         ],
+//         properties: [
+//           "dealname",
+//           "amount",
+//           "dealstage",
+//           "closedate",
+//           "pipeline",
+//           "createdate",
+//           "firstname",
+//           "lastname",
+//           "email",
+//           "address",
+//           "city",
+//           "state",
+//           "zip"
+
+//         ],
+//         limit: 1
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//           'Content-Type': 'application/json'
+//         }
+//       }
+//     );
+
+//     return response.data.results;
+//   } catch (error) {
+//     console.error(
+//       'Error searching deal by object id:',
+//       error.response?.data || error.message
+//     );
+//     return [];
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
 // get associated contacts by deal id
 
 async function getAssociatedContactsByDealId(dealId) {

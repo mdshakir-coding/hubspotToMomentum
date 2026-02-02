@@ -29,7 +29,7 @@ async function syncProspectContact() {
     //   `Lifestage Contacts:${JSON.stringify(lifestageContacts[0], null, 2)}`,
     // );
 
-    return; //todo remove after testing
+    // return; //todo remove after testing
 
     for (const contact of lifestageContacts) {
       try {
@@ -140,6 +140,7 @@ async function syncProspectContact() {
           const principalPayload = buildPrincipalPayload(
             contact,
             insured.insuredDatabaseId,
+            
           );
           logger.info(
             `Principal Payload:${JSON.stringify(principalPayload, null, 2)}`,

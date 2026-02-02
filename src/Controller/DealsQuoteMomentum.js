@@ -79,8 +79,6 @@ async function syncDealsQuoteMomentum() {
 
         }
 
-
-
       } catch (error) {
         logger.error(`Error processing deal ID:${deal.id}`, error);
       }
