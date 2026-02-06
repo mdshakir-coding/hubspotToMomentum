@@ -1265,6 +1265,8 @@ async function searchLifestageContacts() {
           "fax",
           "project_description",
           "website",
+          "commercialName",
+          
         ],
         limit: 200,
         ...(after && { after }),

@@ -46,7 +46,7 @@ async function syncProspectContact() {
           lifecycleStage === "opportunity"
         ) {
           logger.info(
-            `Processing contact ${JSON.stringify(contact, null, 2)} | Stage: ${lifecycleStage}`,
+            `Processing contact ID ${JSON.stringify(contact.id, null, 2)} | Stage: ${lifecycleStage}`,
           );
 
           // search associated company
@@ -102,7 +102,7 @@ async function syncProspectContact() {
         // for customer
         if (lifecycleStage === "customer") {
           logger.info(
-            `Processing contact ${JSON.stringify(contact, null, 2)} | Stage: ${lifecycleStage}`,
+            `Processing contact ID${JSON.stringify(contact.id, null, 2)} | Stage: ${lifecycleStage}`,
           );
 
           // search associated company
