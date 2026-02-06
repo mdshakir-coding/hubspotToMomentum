@@ -173,8 +173,8 @@ function buildMomentumContactPayload(contact, company = {}) {
     description: company?.properties?.description || "Test description",
     website: company?.properties?.website || "https://example.com",
     fax: company?.properties?.fax || "111-222-3333",
-    State : "Alaska",
-
+    State : company?.properties?.state || "Maine",
+    County: "Sagamore",
   
   });
 
@@ -272,7 +272,6 @@ function buildPrincipalPayload(contact, insuredDatabaseId) {
     personal_email: contact?.properties?.email || null,
     business_email: contact?.properties?.email || null,
     insured_email: contact?.properties?.email || null,
-    
 
 
     // address_line_1: contact?.properties?.address || null,

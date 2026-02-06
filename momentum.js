@@ -2,15 +2,15 @@ import "dotenv/config";
 // import dotenv from "dotenv";
 
 import { app, logger, getHubspotContacts, getHubspotCompanies,createCompanyInMomentum,
-  hubspotToMomentumsync,fetchAllCustomerToMomentum} from "./index.js";
-  import { syncHubspotToMomentum } from "./Controller/sycHubspotToMomentum.js";
-  import { syncContactMomentum } from "./Controller/syncContactMomentum.js";
-  import { syncProspectContact } from "./Controller/syncProspectContact.js";
-  import{syncDealsQuoteMomentum}from "./Controller/DealsQuoteMomentum.js"
+  hubspotToMomentumsync,fetchAllCustomerToMomentum} from "./src/index.js";
+  import { syncHubspotToMomentum } from "./src/Controller/sycHubspotToMomentum.js";
+  import { syncContactMomentum } from "./src/Controller/syncContactMomentum.js";
+  import { syncProspectContact } from "./src/Controller/syncProspectContact.js";
+  import{syncDealsQuoteMomentum}from "./src/Controller/DealsQuoteMomentum.js"
   
-import { getAccessToken } from "./service/momentum.service.js";
+import { getAccessToken } from "./src/service/momentum.service.js";
 
-import "./crons/cronScheduler.js";
+import "./src/crons/cronScheduler.js";
 
 console.log("Loaded Token:", process.env.HUBSPOT_API_ACCESS_TOKEN); // debug
 
