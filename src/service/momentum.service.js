@@ -1148,25 +1148,105 @@ async function insertInsuredContact(data, accessToken) {
 //   }
 // }
 
-async function searchLifestageContacts() {
-  console.log("Fetching contacts with lifecyclestage");
+// async function searchLifestageContacts() {
+//   console.log("Fetching contacts with lifecyclestage");
 
-  const limit = 200;
-  let after = null;
-  let hasMore = true;
+//   const limit = 200;
+//   let after = null;
+//   let hasMore = true;
+
+//   const allContacts = [];
+
+//   try {
+//     while (hasMore) {
+//       const requestBody = {
+//         filterGroups: [
+//           {
+//             filters: [
+//               {
+//                 propertyName: "hs_object_id",
+//                 operator: "EQ",
+//                 value: "196244532240",
+//               },
+//             ],
+//           },
+//         ],
+//         properties: [
+//           "firstname",
+//           "lastname",
+//           "lifecyclestage",
+//           "email",
+//           "phone",
+//           "phone_number_1",
+//           "second_phone",
+//           "address",
+//           "city",
+//           "project_zip_code",
+//           "fax",
+//           "project_description",
+//           "website",
+//           "commercialName",
+//         ],
+//         limit,
+//         after,
+//       };
+
+//       const response = await axios.post(
+//         "https://api.hubapi.com/crm/v3/objects/contacts/search",
+//         requestBody,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
+//             "Content-Type": "application/json",
+//           },
+//         },
+//       );
+
+//       const results = response?.data?.results || [];
+//       allContacts.push(...results);
+//       return allContacts; // todo remove after Testing
+
+//       console.log(
+//         `Fetched batch → ${results.length} contacts | Total: ${allContacts.length}`,
+//       );
+
+//       // Pagination handling
+//       if (response.data.paging?.next?.after) {
+//         after = response.data.paging.next.after;
+//       } else {
+//         hasMore = false;
+//       }
+//     }
+
+//     return allContacts;
+//   } catch (error) {
+//     console.error(
+//       "Error fetching lifecyclestage contacts:",
+//       error.response?.data || error.message
+//     );
+//     return allContacts;
+//   }
+// }
+
+// add delta function
+async function searchLifestageContacts() {
+  console.log("Fetching contacts updated in last 30 min");
 
   const allContacts = [];
+  let after = undefined;
+
+  const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
 
   try {
-    while (hasMore) {
+    do {
       const requestBody = {
         filterGroups: [
           {
             filters: [
               {
-                propertyName: "hs_object_id",
-                operator: "EQ",
-                value: "196244532240",
+                propertyName: "hs_lastmodifieddate",
+                operator: "GTE",
+                value: thirtyMinutesAgo.toString(),
               },
             ],
           },
@@ -1185,10 +1265,9 @@ async function searchLifestageContacts() {
           "fax",
           "project_description",
           "website",
-          "commercialName",
         ],
-        limit,
-        after,
+        limit: 200,
+        ...(after && { after }),
       };
 
       const response = await axios.post(
@@ -1199,26 +1278,24 @@ async function searchLifestageContacts() {
             Authorization: `Bearer ${process.env.HUBSPOT_API_ACCESS_TOKEN}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       const results = response?.data?.results || [];
       allContacts.push(...results);
-      return allContacts; // todo remove after Testing
+
+      after = response?.data?.paging?.next?.after;
 
       console.log(
-        `Fetched batch → ${results.length} contacts | Total: ${allContacts.length}`,
+        `Fetched ${results.length} contacts | Total: ${allContacts.length}`
       );
+    } while (after);
 
-      // Pagination handling
-      if (response.data.paging?.next?.after) {
-        after = response.data.paging.next.after;
-      } else {
-        hasMore = false;
-      }
-    }
+    // ✅ filter lifecyclestage safely in code
+    return allContacts.filter(
+      c => c.properties?.lifecyclestage
+    );
 
-    return allContacts;
   } catch (error) {
     console.error(
       "Error fetching lifecyclestage contacts:",
@@ -1227,6 +1304,12 @@ async function searchLifestageContacts() {
     return allContacts;
   }
 }
+
+
+
+
+
+
 
 // search Prospects in momentum
 

@@ -163,18 +163,18 @@ function buildMomentumContactPayload(contact, company = {}) {
     Phone: contact?.properties?.phone || null,
 
     // company details
-    addressLine1: company?.properties?.address || "Test Address 1",
-    addressLine2: company?.properties?.address2 || "Test Address 2",
-    zipCode: company?.properties?.zip || "12345",
-    city: company?.properties?.city || "Test City",
-    phone: company?.properties?.phone || "123-456-7890",
-    cellPhone: company?.properties?.phone_number_1 || "555-555-5555",
-    smsPhone: company?.properties?.second_phone || "098-765-4321",
-    description: company?.properties?.description || "Test description",
-    website: company?.properties?.website || "https://example.com",
-    fax: company?.properties?.fax || "111-222-3333",
-    State : company?.properties?.state || "Maine",
-    County: "Sagamore",
+    addressLine1: company?.properties?.address || null,
+    addressLine2: company?.properties?.address2 || null,
+    zipCode: company?.properties?.zip || null,
+    city: company?.properties?.city || null,
+    phone: company?.properties?.phone || null,
+    cellPhone: company?.properties?.phone_number_1 || null,
+    smsPhone: company?.properties?.second_phone || null,
+    description: company?.properties?.description || null,
+    website: company?.properties?.website || null,
+    fax: company?.properties?.fax || null,
+    State : company?.properties?.state || null,
+    County: company?.properties?.county || null,
   
   });
 
@@ -227,14 +227,9 @@ function buildMomentumContactPayload(contact, company = {}) {
 
 function buildProspectsPayload(contact, company) {
   const payload = cleanProps({
-    // toInsert: {
-    //   type: "Prospect",
-    //  commercialName: "Metzger Insurance Agency",
+
     insured_type: "Commercial",
     type: 0,
-    // active: true,
-    // type: "Prospect",
-    // type: "true",
 
     // firstName: contact?.properties?.firstname || null,
     // lastName: contact?.properties?.lastname || null,
@@ -249,13 +244,6 @@ function buildProspectsPayload(contact, company) {
     description: contact?.properties?.project_description || null,
     website: contact?.properties?.website || null,
     fax: contact?.properties?.fax || null,
-    // addressLine2: contact?.properties?.addressLine2 || null,
-    // stateNameOrAbbreviation: contact?.properties?.stateNameOrAbbreviation || null,
-    // fein: contact?.properties?.fein || null,
-    // eMail2: contact?.properties?.eMail2 || null,
-    // eMail3: contact?.properties?.eMail3 || null,
-    // customerId: contact?.properties?.customerId || null,
-    // insuredId: contact?.properties?.insuredId || null
 
     // }
   });
@@ -274,16 +262,7 @@ function buildPrincipalPayload(contact, insuredDatabaseId) {
     insured_email: contact?.properties?.email || null,
 
 
-    // address_line_1: contact?.properties?.address || null,
-    // address_line_2: contact?.properties?.address|| null,
-    // insured_city: contact?.properties?.city || null,
-    // insured_state: contact?.properties?.state || null,
-    // zip_code: contact?.properties?.zip || null,
-    // insured_phone: contact?.properties?.phone || null,
-    // description: contact?.properties?.description || null,
-
-    // match_record_base_on_name: true,
-    // is_primary: true,
+    
   });
 
   return payload;
