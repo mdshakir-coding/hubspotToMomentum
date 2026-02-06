@@ -25,11 +25,6 @@ async function syncProspectContact() {
     logger.info(
       `Lifestage Contacts:${JSON.stringify(lifestageContacts.length)}`,
     );
-    // logger.info(
-    //   `Lifestage Contacts:${JSON.stringify(lifestageContacts[0], null, 2)}`,
-    // );
-
-    // return; //todo remove after testing
 
     for (const contact of lifestageContacts) {
       try {
@@ -96,7 +91,6 @@ async function syncProspectContact() {
             `Principal in Momentum ${JSON.stringify(principalResponse, null, 2)}`,
           );
 
-          // return;
         }
         //-----------------------------------------------------------------------------------------------
         // for customer
@@ -153,7 +147,6 @@ async function syncProspectContact() {
             `Principal in Momentum ${JSON.stringify(principalResponse, null, 2)}`,
           );
 
-          // return;
         }
       } catch (error) {
         console.error(`Error syncing Contact ID ${contact}:`, error);
